@@ -1,5 +1,11 @@
 \documentclass{tstextbook}
 
+\usepackage{listings}
+\lstset{
+  basicstyle=\ttfamily,
+  mathescape
+}
+
 \usepackage{pythonhighlight}
 %\begin{python}
 %...
@@ -30,7 +36,7 @@
 %---------------------------------------------------------------------------
 
 % introduction
-\include{introduction}
+\include{howbitcoinworks}
 
 
 
@@ -52,6 +58,10 @@
 \section{First section}
 
 Let's start out with the following theorem.
+
+%\begin{note}[First]
+%	blabla here
+%\end{note}
 
 \begin{theorem}[Logic algebra]
   \label{th:logicalgebra}

@@ -248,6 +248,12 @@ contents={\includegraphics[width=\paperwidth,height=\paperheight]{cover}}}
  borderline west={1.5mm}{-2mm}{tsforestgreen}]}
 {\end{tcolorbox}}
 
+\newenvironment{boxemph}
+{\begin{tcolorbox}
+[enhanced jigsaw,breakable,pad at break*=1mm,
+ colback=black!5,colframe=tsorange]}
+{\end{tcolorbox}}
+
 \newenvironment{boxexercise}
 {\begin{tcolorbox}
 [enhanced jigsaw,breakable,pad at break*=1mm,
@@ -299,6 +305,7 @@ contents={\includegraphics[width=\paperwidth,height=\paperheight]{cover}}}
 \theoremstyle{styletheorem}
 \newtheorem{envtheorem}{Theorem}[chapter]
 \newtheorem{envlemma}{Lemma}[chapter]
+%\newtheorem{envnote}{Note}[chapter]
 \theoremstyle{styleexercise}
 \newtheorem{envexercise}{Exercise}[chapter]
 \newtheorem{envproblem}{Problem}[chapter]
@@ -322,6 +329,14 @@ contents={\includegraphics[width=\paperwidth,height=\paperheight]{cover}}}
 \newenvironment{lemma}
                {\begin{boxtheorem}\begin{envlemma}}
                {\end{envlemma}\end{boxtheorem}}
+
+\newenvironment{emphbox}
+	       {\vspace{1em}\begin{boxemph}}
+	       {\end{boxemph}\vspace{1em}}
+
+%\newenvironment{note}
+%               {\begin{boxtheorem}\begin{envnote}}
+%               {\end{envnote}\end{boxtheorem}}
 
 \newenvironment{exercise}
                {\begin{boxexercise}\begin{envexercise}}
