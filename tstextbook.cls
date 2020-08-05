@@ -12,6 +12,8 @@
 % This is a free LaTeX text book template from Typesetters.se.
 % See tstextbook.tex for an example of how to use this class.
 
+% Added emphbox (theorem-like) and note (definition-like) environments without a title and number!
+
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{tstextbook}[2017/02/19 Free LaTeX text book template from Typesetters.se]
 \LoadClass[11pt,onecolumn,titlepage,twoside,openany]{book}
@@ -333,6 +335,10 @@ contents={\includegraphics[width=\paperwidth,height=\paperheight]{cover}}}
 \newenvironment{emphbox}
 	       {\vspace{1em}\begin{boxemph}}
 	       {\end{boxemph}\vspace{1em}}
+
+\newenvironment{note}
+	       {\vspace{1em}\begin{boxdefinition}}
+	       {\end{boxdefinition}\vspace{1em}}
 
 %\newenvironment{note}
 %               {\begin{boxtheorem}\begin{envnote}}

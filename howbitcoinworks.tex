@@ -1,21 +1,8 @@
 \chapter{How Bitcoin Works}
 
 \begin{summary}
-The prologue of this chapter briefly explains the rationale behind writing this book. What follows is The rest of the chapter is a high-level introduction of how Bitcoin works that acts as a summary of things that the reader must know about before moving into the following chapters. The operation of the Bitcoin network is demonstrated with a walkthrough of a transaction and its journey from its creation up until its final destination, the Bitcoin blockchain.
+This chapter provides a high-level introduction of how Bitcoin works. It aims to be a summary of the prerequisite knowledge required by the reader before moving into the following chapters. The operation of the Bitcoin network is demonstrated with a walkthrough of a transaction and its journey from its creation up until its final destination, the Bitcoin blockchain.
 \end{summary}
-
-\section{Prologue}
-This book is not about introducting what Bitcoin is. The readers are expected to understand the basics of the peer-to-peer network, what addresses and private keys are as well as have some experience using wallets and sending bitcoins\footnote{When we refer to the coins we will use \emph{bitcoin(s)} (lowercase `b') and when we refer to the protocol or the network we will use \emph{Bitcoin} (uppercase `B')}. The aim of this book is to help people delve deeper and in particular learn how to \emph{talk} to the Bitcoin network programmatically.
-
-I started teaching Bitcoin programming in 2016. I have given hundreds of presentations in meetups or seminars and from 2017 higher education courses. Every year I was improving and updating my material to keep it as relevant as possible. Luckily, Bitcoin progresses at a steady pace while always keeping backwards compatibility. This is convenient because existing material will always be valid even though better alternatives might be introduced in the future.
-  
-To understand the material better myself and to improve the material in my courses I started an open source Python library, called bitcoin-utils\footnote{https://github.com/karask/python-bitcoin-utils}. The library was created for educational purposes and not for computational efficiency and that might be evident in certain parts of the implementation. Before starting this library I had investigated several other well-known Python libraries but I did not find an appropriate one for educational purposes. Some were too low-level with limited documentation while others where abstracting concepts that I deemed where important for students to understand.
-
-This book is about teaching Bitcoin programming. Throughout the years I have prepared a lot of material based on my early code experiments, the bitcoin-utils library and several online resources, especially the Bitcoin Stack Exchange\footnote{https://bitcoin.stackexchange.com/} and the excellent Bitcoin Book\footnote{https://github.com/bitcoinbook/bitcoinbook} by A. Antonopoulos. While I try to always credit the initial sources that I have consulted over the years it is very possible that I have missed some. Please let me know and I will update accordingly.
-
-My hope is that this book consolidates all this teaching material with practical examples so as to help others understand Bitcoin programming. 
-
-I have been using a Linux-based machine and thus most command-line examples are from \pyth{bash} shell. However, people comfortable with other Operating Systems should have no issues to adjust as needed.
 
 \section{The Story of a Transaction}
 Transactions specify the transfer of bitcoin ownership. Assume we have three actors; Zed, Alice and Bob. Zed has sent 1.5 bitcoins to Alice with $TX_x$ and Alice wants to send 1 bitcoin to Bob. The transaction history will already have an entry of how Alice got her bitcoins (e.g. from Zed).
@@ -39,9 +26,9 @@ Alice has to prove that she is indeed the owner of the address 1Alice when she c
 
 A transaction can consist of several \textbf{\emph{inputs}} (addresses to get bitcoins from\footnote{This is an oversimplification. In reality unspent outputs or UTXOs are used as inputs which are associated with an address.}) and several \textbf{\emph{outputs}} (addresses to send bitcoins to). When an input is used it is completely consumed; i.e. all the bitcoins that the TX contains as inputs need to be \textbf{\emph{spent}}.
 
-\begin{figure}
+\begin{figure}[h]
 \begin{center}
-	\includegraphics[scale=0.5]{images/typical-transaction}
+\includegraphics[scale=0.5]{images/typical-transaction}
 \caption{Typical one input two outputs transaction.}
 \label{fig:typical-transaction}
 \end{center}
@@ -55,12 +42,79 @@ For privacy reasons it is recommended to send the change to a different address 
 
 Any number of inputs and outputs is possible as long as a transaction fee is included; the larger the transaction the larger the transaction fee. The unspent outputs are called \emph{Unspent Transaction Outputs (UTXOs)} and the set of UTXOs is essentially all the available bitcoins in the network.
 
-So, for our initial example in figure~\ref{fig:typical-transaction} Alice creates $TX_y$ to send 1 BTC to Bob. What happens next?
+Once a transaction is created it needs to be sent to a Bitcoin node. After the node receives the transaction it checks if it is valid, e.g. the output amounts should be less or equal to the input amounts, the signature proving ownership should be valid, etc. If it is valid the node will propagate it to all its peers\footnote{To be more precise they will notify their peers of the transaction by its \emph{transaction identifier (txid)} and the peers can choose to request it or not. More details will be provided in the Peer-to-Peer chapter.}, i.e. the other nodes that it is aware of. In turn, the other nodes will check if the transaction is valid and so on and so forth until all nodes receive the transaction (see figure~\ref{fig:transaction-propagation}).
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.5]{images/transaction-propagation}
+\caption{Transaction propagation through the network example.}
+\label{fig:transaction-propagation}
+\end{center}
+\end{figure}
 
 
 \section{From Transactions to Blocks}
+From a Bitcoin's node perspective, the node receives transactions and places all valid ones into its memory pool, or \emph{mempool}. It keeps receiving new ones until it decides that it will group some of those transactions into a block (see figure~\ref{fig:node-perspective}).
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.5]{images/node-perspective}
+\caption{A node receives transactions into its mempool and can attempt to create new blocks for the network.}
+\label{fig:node-perspective}
+\end{center}
+\end{figure}
+
+\vspace{3em}
+\begin{remark}
+We are describing what mining nodes typically do. The majority of nodes are not mining nodes and thus do not attempt to create new blocks, rather they validate and propagate valid transactions and blocks when they are aware of them.
+\end{remark}
+
+Every block contains a \emph{coinbase} transaction that is added by the miner (see next section) and it sends a deterministically calculated reward to an address of the miner's choosing. Finally a header is added to the block containing important information that links this block to its parent and other information that we will examine in the next section.
+
 \section{Mining}
+After a node creates a block it will attempt to make it final by propagating it to all other nodes in the network. Multiple nodes will receive the same transactions and will create blocks; nodes choose which TXs to include (see figure~\ref{fig:different-nodes-mining}). They can create and propagate a block at any time.
+
+\begin{emphbox}
+But how do we select which blocks will be part of the blockchain? Since, miners include a reward for themselves everyone wants their block to be the next block in the blockchain. In other words, how do we avoid spam and Denial of Service (DoS) attacks?
+\end{emphbox}
+
+For a block to be considered valid a miner has to prove that he has done some intensive computational work. Thus, miners have to spend resources before they create a block. This mechanism of proving computational work is called \emph{Proof-of-Work (PoW)} and it involves solving a problem or puzzle. PoW puzzles have the fundamental property of being difficult to solve but trivial to validate their correctness. 
+
+Bitcoin mining is the process of solving the PoW puzzle and selecting the next valid block in a way that is undisputed and thus achieve consensus on the current blockchain state. Bitcoin uses the Hashcash PoW algorithm~\cite{Back2002-hashcash} for its mining.
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.5]{images/different-nodes-mining}
+\caption{All nodes will eventually receive all transactions but they are free to include them into a block as they see fit.}
+\label{fig:different-nodes-mining}
+\end{center}
+\end{figure}
+
+The Proof-of-Work puzzle is to compute a cryptographic hash of the new block that we want to create which should be less than a given number. The target number that the hash needs to be less than can be deterministically calculated by all nodes and is such that it would take around 10 minutes to calculate with the current network processing power, also called hashing power. Since a hash is random it will take several attempts to find a proper hash but other nodes will verify with only one attempt.
+
+\begin{remark}
+A cryptographic hash function is a hash function that takes an arbitrary block of data and returns a fixed-size bit string, the cryptographic hash value, such that any (accidental or intentional) change to the data will also change the hash value significantly.
+\end{remark}
+
+As more miners join the blocks will be created faster so the puzzle’s difficulty automatically adjusts (increases) so that it again requires approximately 10 minutes to solve. This \emph{difficulty adjustment} is happening every 2016 blocks, which is approximately 2 weeks if each block takes 10 minutes to mine.
+
+The hash algorithm used is $SHA256$ and it is applied twice to the block header. As we will see later the header uniquely represents the whole block including all the transaction and thus hashing the header is effectively the same as hashing the whole block but with the added benefit of efficiency since the header is much smaller.
+
+\begin{emphbox}
+\begin{lstlisting}
+SHA256( SHA256( block_header ) )
+\end{lstlisting}
+\end{emphbox}
+
+The miner that successfully creates a valid block first will get the bitcoin reward that they have set themselves in the coinbase transaction as well as the fees from all the transactions in the block.
+
+The block reward can be deterministally calculated according to the current \emph{block height}. The reward started at 50 bitcoins and is halved every 210000 blocks (approximately 4 years for 10 minute blocks). So, after block 630000 the reward will be 6.25 bitcoins. The mining reward can be claimed by the miner only after 100 \emph{confirmations}, i.e. after 100 blocks have been confirmed as part of the blockchain since.
+
+
+
+
 \section{Blocks and Nakamoto Consensus}
+If the transaction does not make it into a block it remains in the mempool to be added into the next block. If the node is made aware of a new valid block then it updates the block th
 \section{Basic interaction with a node}
 
 %problems? exercises? computer excercises???
