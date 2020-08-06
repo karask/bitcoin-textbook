@@ -332,15 +332,17 @@ contents={\includegraphics[width=\paperwidth,height=\paperheight]{cover}}}
                {\begin{boxtheorem}\begin{envlemma}}
                {\end{envlemma}\end{boxtheorem}}
 
+% added for similar to theorem but with no number and title
 \newenvironment{emphbox}
 	       {\vspace{1em}\begin{boxemph}}
 	       {\end{boxemph}\vspace{1em}}
 
+% added for similar to definition but with no number and title
 \newenvironment{note}
 	       {\vspace{1em}\begin{boxdefinition}}
 	       {\end{boxdefinition}\vspace{1em}}
 
-%\newenvironment{note}
+%\newenvironment{nnnote}
 %               {\begin{boxtheorem}\begin{envnote}}
 %               {\end{envnote}\end{boxtheorem}}
 
@@ -372,6 +374,17 @@ contents={\includegraphics[width=\paperwidth,height=\paperheight]{cover}}}
 {\vspace{0.5cm}\noindent\small\it
  \marginpar{\vspace{-3mm}\includegraphics[width=1.0cm]{idea}}}
 {\vspace{0.5cm}}
+
+
+% New commands
+%--------------------------------------------------------------------------
+%\newcommand\code{\texttt}
+%\newcommand\code[1]{\texttt{\textbf{#1}}}
+\newcommand\keyword[1]{\textsf{\textbf{#1}}}
+\newcommand\important[1]{\textbf{\textit{#1}}}
+
+% Renew commands
+%\renewcommand\emph{\textbf}
 
 % Bibliography
 %--------------------------------------------------------------------------

@@ -24,7 +24,7 @@ The names 1Zed, 1Alice and 1Bob are short for the actual bitcoin addresses of Ze
 
 Alice has to prove that she is indeed the owner of the address 1Alice when she creates the $TX_y$. Bob does not need to do anything to receive the bitcoins.
 
-A transaction can consist of several \textbf{\emph{inputs}} (addresses to get bitcoins from\footnote{This is an oversimplification. In reality unspent outputs or UTXOs are used as inputs which are associated with an address.}) and several \textbf{\emph{outputs}} (addresses to send bitcoins to). When an input is used it is completely consumed; i.e. all the bitcoins that the TX contains as inputs need to be \textbf{\emph{spent}}.
+A transaction can consist of several \emph{inputs} (addresses to get bitcoins from\footnote{This is an oversimplification. In reality unspent outputs or UTXOs are used as inputs which are associated with an address.}) and several \emph{outputs} (addresses to send bitcoins to). When an input is used it is completely consumed; i.e. all the bitcoins that the TX contains as inputs need to be \emph{spent}.
 
 \begin{figure}[h]
 \begin{center}
@@ -71,7 +71,7 @@ We are describing what mining nodes typically do. The majority of nodes are not 
 
 Every block contains a \emph{coinbase} transaction that is added by the miner (see next section) and it sends a deterministically calculated reward to an address of the miner's choosing. Finally a header is added to the block containing important information that links this block to its parent and other information that we will examine in the next section.
 
-\section{Mining}
+\section{Mining: basics}
 After a node creates a block it will attempt to make it final by propagating it to all other nodes in the network. Multiple nodes will receive the same transactions and will create blocks; nodes choose which TXs to include (see figure~\ref{fig:different-nodes-mining}). They can create and propagate a block at any time.
 
 \begin{emphbox}
@@ -98,7 +98,7 @@ A cryptographic hash function is a hash function that takes an arbitrary block o
 
 As more miners join the blocks will be created faster so the puzzle’s difficulty automatically adjusts (increases) so that it again requires approximately 10 minutes to solve. This \emph{difficulty adjustment} is happening every 2016 blocks, which is approximately 2 weeks if each block takes 10 minutes to mine.
 
-The hash algorithm used is $SHA256$ and it is applied twice to the block header. As we will see later the header uniquely represents the whole block including all the transaction and thus hashing the header is effectively the same as hashing the whole block but with the added benefit of efficiency since the header is much smaller.
+The hash algorithm used is \keyword{SHA256} and it is applied twice to the block header. As we will see later the header uniquely represents the whole block including all the transaction and thus hashing the header is effectively the same as hashing the whole block but with the added benefit of efficiency since the header is much smaller.
 
 \begin{emphbox}
 \begin{lstlisting}
@@ -111,15 +111,129 @@ The miner that successfully creates a valid block first will get the bitcoin rew
 The block reward can be deterministally calculated according to the current \emph{block height}. The reward started at 50 bitcoins and is halved every 210000 blocks (approximately 4 years for 10 minute blocks). So, after block 630000 the reward will be 6.25 bitcoins. The mining reward can be claimed by the miner only after 100 \emph{confirmations}, i.e. after 100 blocks have been confirmed as part of the blockchain since.
 
 
-\subsection*{Block Header structure explanation}
-Blablabla.
+\section{Mining: a bit more technical}
 
-difficulty adjustment and formula
+The structure of the block header is as follows:
+
+\begin{center}
+\begin{tabular}{ |l|l|l| }
+\hline
+	Field & Description & Size (bytes)\\
+\hline
+	version        & Block version number                               & 4\\
+	hashPrevBlock  & 256-bit hash of the previous block                 & 32\\
+	hashMerkleRoot & 256-bit hash representing all the TXs in the block & 32\\
+	timestamp      & Seconds since 1970-01-01T00:00 UTC                 & 4\\
+	target (bits)  & The target that the hash should be less than       & 4\\
+	nonce          & 32-bit number                                      & 4\\
+\hline
+\end{tabular}
+\end{center}
+
+Block version and timestamp are self explanatory but we will briefly go through the remaining fields.
+
+\subsection*{hashMerkleRoot}
+A block has two parts, the header and the transactions. Since we only hash the block header to link blocks together, a header needs to represent the whole block, including all its transactions (coinbase and normal). The transactions are indirectly hashed via using a merkle root and being included in the block by \keyword{hashMerkleRoot}.
+
+A merkle tree\footnote{https://en.wikipedia.org/wiki/Merkle\_tree} is constructed by concatenating all the transaction hashes, in pairs. The resulting hashes are again concatenated and hashed until only a single hash remains, the merkle root.
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.5]{images/merkle-tree}
+\caption{Simple merkle root calculation of coinbase and three transactions.}
+\label{fig:merkle-tree}
+\end{center}
+\end{figure}
+
+An important property of a merkle tree is that you can efficiently prove that a hash (and thus transaction) is part of the merkle root. A merkle proof consists of the hashes and their position in order to reach from a leaf TX hash to the merkle root, thus proving that that TX hash is indeed part of the merkle tree. For example to prove that \keyword{tx1} is part of the merkle root we would need to provide the hash of \keyword{cb} and its positioning (i.e. left) as well as the parent hash of \keyword{tx2} and \keyword{tx3} (\keyword{cc3f1}) and its positioning (i.e. right).
+
+\subsection*{hashPrevBlock}
+This is the hash of the previous block in the blockchain. It designates the parent of the current block and it is effectively what chains the blocks together. For example, if someone changes a transaction in the previous block then the \keyword{hashPrevBlock} will change. This is of particular importance as we will see in more detail in section~\ref{sec:blocks-nakamote-consensus}.
+
+\subsection*{target}
+Target bits or just bits is represented as an 8 hex-digit number. The first 2 digits are the exponent and the rest the coefficient. Target bits can be used to calculate the actual target with the following formula:
+
+\begin{emphbox}
+\begin{lstlisting}
+    $target = coefficient * 2^{(8 * (exponent – 3))}$
+\end{lstlisting}
+\end{emphbox}
+
+The highest possible target (the easiest target) is defined as \keyword{0x1d00ffff} and gives a 32-byte target of expressed as a 64 hexadecimal number) of:
+
+\small
+\begin{emphbox}
+\begin{lstlisting}
+0x00000000ffff0000000000000000000000000000000000000000000000000000
+\end{lstlisting}
+\end{emphbox}
+\normalsize
+
+If hashing the block header produces a hash that begins with 0x00000000e (or less) then we have found a solution. That would require, statistically ~$2^{32}$ (4,294,967,296) attempts on average. The smaller the target the more difficult the solution, the more attempts on average.
+
+Another representation of target, easier for humans to understand, is \emph{difficulty} which represents the ratio between the highest target and the current target:
+
+\begin{emphbox}
+\begin{lstlisting}
+$Difficulty = \dfrac{highest\_target} {current\_target}$
+\end{lstlisting}
+\end{emphbox}
+
+When Bitcoin started it started with the highest target (\keyword{0x1d00fff}) and thus it had difficulty 1. Difficulty 1 requires $2^{32}$ attempts on average to find a solution. Difficulty 10 requires $2^{32} * 10$ attempts on average, etc.
+
+\subsection*{nonce}
+The nonce is just a number used to differentiate the hash while trying to reach the target. Given that it is only 4 bytes it can only handle ~4.2 billion combinations, while we need quintillion nowadays\footnote{As of August 2020.}.
+
+When the limit was reached miners started modifying the timestamp (e.g. -1 sec) to allow for an additional of ~4.2 billion combinations. However, there is a limit of seconds that a node can deviate from the rest of the network so that did not suffice either.
+
+Finally, miners started to use the unused space of coinbase transaction inputs as an extra nonce allowing an immense amount of extra nonces to be used. and thus it had difficulty 1. Difficulty 1 requires $2^{32}$ attempts on average to find a solution. Difficulty 10 requires $2^{32} * 10$ attempts on average, etc. and thus it had difficulty 1. Difficulty 1 requires $2^{32}$ attempts on average to find a solution. Difficulty 10 requires $2^{32} * 10$ attempts on average, etc.
+
+
+\subsection*{Difficulty Adjustment}
+We already mentioned that we want the difficulty to find the proper hash is expected to take approximately 10 minutes. However, Bitcoin is an open system and anyone can join (or leave) the network as a miner. Thus, the network’s hashrate can increase (or decrease) with time. 
+
+With more hashing power blocks will be issued faster than 10 minutes and thus the network has to adjust the difficulty of the problem accordingly.
+
+Specifically, Bitcoin nodes, check every 2016 blocks (~2 weeks) the timestamps between consecutive blocks and sums them to find out how much time $t$ it took. We want $t$ to take two weeks and thus the new difficulty will be:
+
+\begin{emphbox}
+\begin{lstlisting}
+$old\_difficulty * ( \frac{2\_weeks} {t} )$
+\end{lstlisting}
+\end{emphbox}
 
 \subsection*{Mining Process in a nutshell}
-Blablabla.
+Here we describe a mining node's actions for mining in a simplified step by step process:
+
+\begin{enumerate}
+\item Gather valid TXs into blocks
+\item Get the longest chain’s top block hash and add it in hashPrevBlock
+\item Add timestamp, nonce and extra nonce in the first TX (coinbase)
+\item Calculate the merkle root of valid TXs and add it to hashMerkleRoot
+\item Hash the header to find a solution smaller than the specified target
+  \begin{itemize}
+  \item modify timestamp, nonce or extra nonce as appropriate
+  \item rehash until a solution is found or the longest chain changed
+  \end{itemize}
+\end{enumerate}
+
+During the above process:
+\begin{itemize}
+\item If more TXs are included in the block or the extra nonce is modified
+  \begin{itemize}
+  \item recalculate merkle root and update it
+  \end{itemize}
+\item If the longest chain changed we want to build on that chain from now on
+  \begin{itemize}
+  \item update the valid TX set
+  \item ecalculate the merkle root
+  \item use the new block as hashPrevBlock
+  \end{itemize}
+\end{itemize}
+
 
 \section{Blocks and Nakamoto Consensus}
+\label{sec:blocks-nakamote-consensus}
 If the transaction does not make it into a block it remains in the mempool to be added into the next block. If the node is made aware of a new valid block then it updates the block th
 
 \section{Basic interaction with a node}
