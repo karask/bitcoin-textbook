@@ -47,7 +47,7 @@ Once a transaction is created it needs to be sent to a Bitcoin node. After the n
 \begin{figure}[h]
 \begin{center}
 \includegraphics[scale=0.5]{images/transaction-propagation}
-\caption{Transaction propagation through the network example.}
+\caption{Example of transaction propagation through the network.}
 \label{fig:transaction-propagation}
 \end{center}
 \end{figure}
@@ -232,11 +232,65 @@ During the above process:
 \end{itemize}
 
 
-\section{Blocks and Nakamoto Consensus}
+\section{The story of a Block}
 \label{sec:blocks-nakamote-consensus}
-If the transaction does not make it into a block it remains in the mempool to be added into the next block. If the node is made aware of a new valid block then it updates the block th
+Once a node finds a solution to the PoW problem it will propagate it to its peers. They will check if the block (and every transaction) is valid and if it is they will propagate it to all their peers\footnote{To be more precise they will notify their peers of the block and the peers can choose to request the actual block or not. More details will be provided in the Peer-to-Peer chapter.}. In turn, the peers will check again for the solution as well as the block validity and they will propagate again and so on and so forth until all nodes receive the new block (see figure~\ref{fig:block-propagation}).
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.5]{images/block-propagation}
+\caption{Example of block propagation through the network.}
+\label{fig:block-propagation}
+\end{center}
+\end{figure}
+
+The new block is being added on top of the existing blocks (every ~10 minutes). This occurs on every single node on the network thus the blocks are the same in all nodes. Blocks are linked with cryptographic hashes forming a chain of blocks, called \emph{Blockchain}.
+
+When Block \keyword{B1} is accepted by the network we say that a transaction on that block has one confirmation. When \keyword{B3} is accepted we say that our transaction has 3 confirmations (see figure~\ref{node-perspective-2}. The more confirmations the more final and secure a transaction is. 
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.5]{images/node-perspective-2}
+\caption{A node receives blocks and links them to form the blockchain.}
+\label{fig:node-perspective-2}
+\end{center}
+\end{figure}
+
+
+\section{Nakamoto Consensus and Trust}
+Each node receives blocks and builds its own blockchain in isolation. A fundamental innovation that bitcoin introduced is the Nakamoto consensus, i.e. how do different nodes come to agreement on what is the current state of the blockchain.
+
+If two miners find a block (almost) at the same time then network peers will get a different block first. They will then start building the next block based on the one they received first. That means that the network at that time has two possible states.
+
+In Nakamoto consensus the basic rule is that miners should \emph{follow the longer chain} (the one with the most computation). Thus, when one of the miners finds the next block all miners will choose the longer chain and consensus is achieved. For an example see the different steps in figure~\ref{fig:nakamoto-consensus}.
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.4]{images/nakamoto-consensus}
+\caption{Nakamoto Consensus example.}
+\label{fig:nakamoto-consensus}
+\end{center}
+\end{figure}
+
+\begin{enumerate}[(i)]
+\item Initially our example network has only two blocks and all nodes are in sync.
+\item Then node \keyword{I} finds the next block, which is disseminated to all other nodes and again everyone is in sync.
+\item Next, let's suppose that two nodes find a solution at about the same time. These blocks will typically be very similar, including almost the same transactions, but will be different.
+\item The nodes will propagate their blocks and some peers will get one of the blocks and some the other. The nodes are aware of both blocks but thei will use the block that they received first as the next block and will start mining the next block on top of that block. At this stage we do not have consensus since some of the nodes have a blockchain with the orange block at the top and some the green block.
+\item However, after a while a new block will be found. In our example, this is node \keyword{F} and it will propagate it throughout the network.
+\item Finally, when the block is propagated to the nodes with the green block on top they will realise that there is a longer chain than the one that they are working on. According to nakamoto consensus the nodes will accept the longer chain as the \emph{valid} chain and ignore the green block. And now all nodes are in sync again. 
+\end{enumerate}
+
+\vspace{3em}
+\begin{remark}
+If there are transactions in the green block that are not in the orange or the blue block they are moved to the mempool ready to be included in one of the following blocks.
+\end{remark}
+
+ADD BLOCKCHAIN AND TRUST HERE
 
 \section{Basic interaction with a node}
 
 %problems? exercises? computer excercises???
+% check historical records of hashrate and difficulty and see the adjustments...?
+
 

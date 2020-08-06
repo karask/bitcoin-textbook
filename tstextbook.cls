@@ -413,3 +413,11 @@ contents={\includegraphics[width=\paperwidth,height=\paperheight]{cover}}}
 \RequirePackage[most]{tcolorbox}
 \RequirePackage{booktabs}
 \RequirePackage{url}
+
+% Notes on fonts
+% The visual \textXX commands will change 3 axes of the text: shape, family and weight.
+% The shape axis covers: \textup, \textit, \textsc and \textsl
+% The family axis covers: \textrm, \textsf, \texttt
+% The weight axis covers: \textbf, \textmd
+% https://tex.stackexchange.com/questions/5008/when-to-use-bold-italics-small-caps-typewriter-etc
+
