@@ -276,17 +276,44 @@ In Nakamoto consensus the basic rule is that miners should \emph{follow the long
 \item Initially our example network has only two blocks and all nodes are in sync.
 \item Then node \keyword{I} finds the next block, which is disseminated to all other nodes and again everyone is in sync.
 \item Next, let's suppose that two nodes find a solution at about the same time. These blocks will typically be very similar, including almost the same transactions, but will be different.
-\item The nodes will propagate their blocks and some peers will get one of the blocks and some the other. The nodes are aware of both blocks but thei will use the block that they received first as the next block and will start mining the next block on top of that block. At this stage we do not have consensus since some of the nodes have a blockchain with the orange block at the top and some the green block.
+\item The nodes will propagate their blocks and some peers will get one of the blocks and some the other. The nodes are aware of both blocks but they will use the block that they received first as the next block and will start mining the next block on top of that block. At this stage we do not have consensus since some of the nodes have a blockchain with the orange block at the top and some the green block.
 \item However, after a while a new block will be found. In our example, this is node \keyword{F} and it will propagate it throughout the network.
-\item Finally, when the block is propagated to the nodes with the green block on top they will realise that there is a longer chain than the one that they are working on. According to nakamoto consensus the nodes will accept the longer chain as the \emph{valid} chain and ignore the green block. And now all nodes are in sync again. 
+\item Finally, when the block is propagated to the nodes with the green block on top they will realise that there is a longer chain than the one that they are working on. According to nakamoto consensus the nodes will accept the longer chain as the \emph{valid} chain and ignore the green block. The green block is typically called an \emph{orphan} block\footnote{Precise terminology is more complicated as discussed in https://bitcoin.stackexchange.com/questions/5859/what-are-orphaned-and-stale-blocks}. And now all nodes are in sync again. 
 \end{enumerate}
 
 \vspace{3em}
 \begin{remark}
-If there are transactions in the green block that are not in the orange or the blue block they are moved to the mempool ready to be included in one of the following blocks.
+If there are transactions in the orphaned block that are not in the orange or the blue block they are moved to the mempool ready to be included in one of the following blocks.
 \end{remark}
 
-ADD BLOCKCHAIN AND TRUST HERE
+Of course it would be possible that at step (v) 2 new solutions could again be found one from a node with an orange block on top and another from a green block on top. Similarly, consenus would be achieved with the following block and two blocks would be orphaned. In such a case, we would say that a 2-block \emph{reorg} occurred.
+
+Nakamoto consensus is a natural and expected reorg event that currently occurs about once per week\footnote{https://bitcoinchain.com/block\_explorer/orphaned} for 1-block reorgs. The chance of a reorg is proportional with the number of blocks and thus larger reorgs are exceedingly rare.
+
+\subsection*{Establishing Trust}
+As we have seen, blocks are linked together by including the hash of the previous block on the new block. For example, in figure~\ref{fig:blockchain-trust} the hash of \keyword{B1} is included in the header of \keyword{B2}.
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.5]{images/blockchain-trust}
+\caption{Linked blocks and Trust.}
+\label{fig:blockchain-trust}
+\end{center}
+\end{figure}
+
+In our example a transaction in \keyword{B1} (represented with the cyan box) has 3 confirmations. If an attacker wishes to attempt a double spend attack\footnote{https://en.wikipedia.org/wiki/Double-spending} they will need to create and new \keyword{B1'} block with the modified transaction. However, there are two more blocks on top of \keyword{B1} and thus the attackers block will be ignored since \keyword{B1'} will not be the longer chain. The attacker also needs to create \keyword{B2'}, \keyword{B3'} and \keyword{B4'} to succeed in a double spend. 
+
+To achieve that, the attacker will need to have the majority of the network's hash rate, which is what is typically called the 51\% attack\footnote{Certain attacks, like selfish mining, could be successful with a smaller percentage.}.
+
+Achieving this kind of hash rate and sustaining it would require billions of dollars in mining hardware and operational costs and thus it would not be easily feasible, especially when one considers what is possible with such an attack: potential censorship and double spents. Even with such an attack the funds on all the Bitcoin addressses are safe as is the historical records of the transactions; the former are secured by cryptography while the latter would require much more hash rate to modify them.
+
+Bitcoin security model is based on game theory principles and proper incentives. Economically speaking only a very irrational person would make such an attack since setting up the environment for the attack would position the attacker in a very economically advantageous position, i.e. they will be earning a lot of money with the mined bitcoins.
+
+\begin{emphbox}
+Even though Bitcoin and Nakamoto Consensus provide us with some of the strongest propabilistic guarantees it is theoritically possible to be influenced by malevolent actors. 
+\end{emphbox}
+
+
 
 \section{Basic interaction with a node}
 
