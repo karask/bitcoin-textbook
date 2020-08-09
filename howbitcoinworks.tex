@@ -7,9 +7,9 @@ This chapter provides a high-level introduction of how Bitcoin works. It aims to
 \section{The Story of a Transaction}
 Transactions specify the transfer of bitcoin ownership. Assume we have three actors; Zed, Alice and Bob. Zed has sent 1.5 bitcoins to Alice with $TX_x$ and Alice wants to send 1 bitcoin to Bob. The transaction history will already have an entry of how Alice got her bitcoins (e.g. from Zed).
 
-\begin{remark}
+\begin{note}
 Internally, the Bitcoin protocol operates with satoshis: $1~satoshi = 0.00000001~BTC$. Thus, when we want to transfer 1 BTC we actually transfer $100000000~satoshis$.
-\end{remark}
+\end{note}
 
 To send 1 bitcoin (or \emph{BTC}) Alice needs to create a transaction $TX_y$ that sends 1 BTC to Bob. We know that Alice has at least 1.5 BTC from $TX_x$.
 
@@ -36,9 +36,9 @@ A transaction can consist of several \emph{inputs} (addresses to get bitcoins fr
 
 The amount of all the inputs needs to be greater or equal to the amounts of outputs. If greater (recommended) the difference is an implied transaction fee that goes to the miners (see figure~\ref{fig:typical-transaction}). A typical transaction transfers some bitcoins to another user and returns the remaining bitcoins as change to the originating address or another address that the sender controls.
 
-\begin{remark}
+\begin{note}
 For privacy reasons it is recommended to send the change to a different address than the originating. Most bitcoin wallets already do this behind the scenes.
-\end{remark}
+\end{note}
 
 Any number of inputs and outputs is possible as long as a transaction fee is included; the larger the transaction the larger the transaction fee. The unspent outputs are called \emph{Unspent Transaction Outputs (UTXOs)} and the set of UTXOs is essentially all the available bitcoins in the network.
 
@@ -64,10 +64,10 @@ From a Bitcoin's node perspective, the node receives transactions and places all
 \end{center}
 \end{figure}
 
-\vspace{3em}
-\begin{remark}
+%\vspace{3em}
+\begin{note}
 We are describing what mining nodes typically do. The majority of nodes are not mining nodes and thus do not attempt to create new blocks, rather they validate and propagate valid transactions and blocks when they are aware of them.
-\end{remark}
+\end{note}
 
 Every block contains a \emph{coinbase} transaction that is added by the miner (see next section) and it sends a deterministically calculated reward to an address of the miner's choosing. Finally a header is added to the block containing important information that links this block to its parent and other information that we will examine in the next section.
 
@@ -92,9 +92,9 @@ Bitcoin mining is the process of solving the PoW puzzle and selecting the next v
 
 The Proof-of-Work puzzle is to compute a cryptographic hash of the new block that we want to create which should be less than a given number. The target number that the hash needs to be less than can be deterministically calculated by all nodes and is such that it would take around 10 minutes to calculate with the current network processing power, also called hashing power. Since a hash is random it will take several attempts to find a proper hash but other nodes will verify with only one attempt.
 
-\begin{remark}
+\begin{note}
 A cryptographic hash function is a hash function that takes an arbitrary block of data and returns a fixed-size bit string, the cryptographic hash value, such that any (accidental or intentional) change to the data will also change the hash value significantly.
-\end{remark}
+\end{note}
 
 As more miners join the blocks will be created faster so the puzzle’s difficulty automatically adjusts (increases) so that it again requires approximately 10 minutes to solve. This \emph{difficulty adjustment} is happening every 2016 blocks, which is approximately 2 weeks if each block takes 10 minutes to mine.
 
@@ -246,7 +246,7 @@ Once a node finds a solution to the PoW problem it will propagate it to its peer
 
 The new block is being added on top of the existing blocks (every ~10 minutes). This occurs on every single node on the network thus the blocks are the same in all nodes. Blocks are linked with cryptographic hashes forming a chain of blocks, called \emph{Blockchain}.
 
-When Block \keyword{B1} is accepted by the network we say that a transaction on that block has one confirmation. When \keyword{B3} is accepted we say that our transaction has 3 confirmations (see figure~\ref{node-perspective-2}. The more confirmations the more final and secure a transaction is. 
+When Block \keyword{B1} is accepted by the network we say that a transaction on that block has one confirmation. When \keyword{B3} is accepted we say that our transaction has 3 confirmations (see figure~\ref{fig:node-perspective-2}. The more confirmations the more final and secure a transaction is. 
 
 \begin{figure}[h]
 \begin{center}
@@ -282,9 +282,9 @@ In Nakamoto consensus the basic rule is that miners should \emph{follow the long
 \end{enumerate}
 
 \vspace{3em}
-\begin{remark}
+\begin{note}
 If there are transactions in the orphaned block that are not in the orange or the blue block they are moved to the mempool ready to be included in one of the following blocks.
-\end{remark}
+\end{note}
 
 Of course it would be possible that at step (v) 2 new solutions could again be found one from a node with an orange block on top and another from a green block on top. Similarly, consenus would be achieved with the following block and two blocks would be orphaned. In such a case, we would say that a 2-block \emph{reorg} occurred.
 
@@ -305,14 +305,17 @@ In our example a transaction in \keyword{B1} (represented with the cyan box) has
 
 To achieve that, the attacker will need to have the majority of the network's hash rate, which is what is typically called the 51\% attack\footnote{Certain attacks, like selfish mining, could be successful with a smaller percentage.}.
 
-Achieving this kind of hash rate and sustaining it would require billions of dollars in mining hardware and operational costs and thus it would not be easily feasible, especially when one considers what is possible with such an attack: potential censorship and double spents. Even with such an attack the funds on all the Bitcoin addressses are safe as is the historical records of the transactions; the former are secured by cryptography while the latter would require much more hash rate to modify them.
+Achieving this kind of hash rate and sustaining it would require extravagant amounts of funds to accommodate for the mining hardware and operational costs and thus it would not be easily feasible. 
 
-Bitcoin security model is based on game theory principles and proper incentives. Economically speaking only a very irrational person would make such an attack since setting up the environment for the attack would position the attacker in a very economically advantageous position, i.e. they will be earning a lot of money with the mined bitcoins.
+This is even more evident when one considers what is possible with such an attack: potential censorship and double spends. Even with such an attack the funds on all the Bitcoin addresses are safe as is the historical records of the transactions; the former are secured by strong cryptography while the latter would require much more hash rate to modify them.
 
-\begin{emphbox}
-Even though Bitcoin and Nakamoto Consensus provide us with some of the strongest propabilistic guarantees it is theoritically possible to be influenced by malevolent actors. 
-\end{emphbox}
+Bitcoin security model is based on game theory principles and proper incentives. Economically speaking only a very irrational entity would make such an attack since setting up the environment for the attack would position the attacker in a very economically advantageous position, i.e. they will be earning a lot of money with the mined bitcoins.
 
+\begin{note}
+Even though Bitcoin and Nakamoto Consensus provide us with some of the strongest probabilistic guarantees it is theoretically possible to be influenced by malevolent actors. 
+\end{note}
+
+Until now the network had been extremely resilient to any kind of attack and has proven its robustness and stability securing hundreds of billions worth of value. The Bitcoin blockchain is considered by many as the most immutable structure constructed by humans.
 
 
 \section{Basic interaction with a node}
