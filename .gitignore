@@ -9,3 +9,5 @@
 *.pdf
 *.bbl
 *.blg
+*.ilg
+*.ind

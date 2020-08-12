@@ -14,7 +14,7 @@ Internally, the Bitcoin protocol operates with satoshis: $1~satoshi = 0.00000001
 To send 1 bitcoin (or \emph{BTC}) Alice needs to create a transaction $TX_y$ that sends 1 BTC to Bob. We know that Alice has at least 1.5 BTC from $TX_x$.
 
 \begin{emphbox}
-\begin{lstlisting}
+\begin{lstlisting}[style=Pseudomath]
     $TX_x$: 1Zed transfers 1.5 BTC to 1Alice
     $TX_y$: 1Alice transfers 1 BTC to 1Bob
 \end{lstlisting}
@@ -101,7 +101,7 @@ As more miners join the blocks will be created faster so the puzzle’s difficul
 The hash algorithm used is \keyword{SHA256} and it is applied twice to the block header. As we will see later the header uniquely represents the whole block including all the transaction and thus hashing the header is effectively the same as hashing the whole block but with the added benefit of efficiency since the header is much smaller.
 
 \begin{emphbox}
-\begin{lstlisting}
+\begin{lstlisting}[style=Pseudomath]
 SHA256( SHA256( block_header ) )
 \end{lstlisting}
 \end{emphbox}
@@ -154,7 +154,7 @@ This is the hash of the previous block in the blockchain. It designates the pare
 Target bits or just bits is represented as an 8 hex-digit number. The first 2 digits are the exponent and the rest the coefficient. Target bits can be used to calculate the actual target with the following formula:
 
 \begin{emphbox}
-\begin{lstlisting}
+\begin{lstlisting}[style=Pseudomath]
     $target = coefficient * 2^{(8 * (exponent – 3))}$
 \end{lstlisting}
 \end{emphbox}
@@ -163,7 +163,7 @@ The highest possible target (the easiest target) is defined as \keyword{0x1d00ff
 
 \small
 \begin{emphbox}
-\begin{lstlisting}
+\begin{lstlisting}[style=Pseudomath]
 0x00000000ffff0000000000000000000000000000000000000000000000000000
 \end{lstlisting}
 \end{emphbox}
@@ -174,7 +174,7 @@ If hashing the block header produces a hash that begins with 0x00000000e (or les
 Another representation of target, easier for humans to understand, is \emph{difficulty} which represents the ratio between the highest target and the current target:
 
 \begin{emphbox}
-\begin{lstlisting}
+\begin{lstlisting}[style=Pseudomath]
 $Difficulty = \dfrac{highest\_target} {current\_target}$
 \end{lstlisting}
 \end{emphbox}
@@ -197,7 +197,7 @@ With more hashing power blocks will be issued faster than 10 minutes and thus th
 Specifically, Bitcoin nodes, check every 2016 blocks (~2 weeks) the timestamps between consecutive blocks and sums them to find out how much time $t$ it took. We want $t$ to take two weeks and thus the new difficulty will be:
 
 \begin{emphbox}
-\begin{lstlisting}
+\begin{lstlisting}[style=Pseudomath]
 $old\_difficulty * ( \frac{2\_weeks} {t} )$
 \end{lstlisting}
 \end{emphbox}
@@ -319,8 +319,184 @@ Until now the network had been extremely resilient to any kind of attack and has
 
 
 \section{Basic interaction with a node}
+After installing the Bitcoin software\footnote{You can find several online resources on how to install Bitcoin specifically for your operating system. Such tutorial is outside the scope of this book.} we can notice that it includes several executables, one providing the core functionality and the other for interaction and extra utility:
+\begin{description}
+	\item[bitcoind:] The daemon server that implements the Bitcoin protocol and networking functionality. It also includes a wallet. It provides a JSON-RPC API to talk to the node (ports: mainnet: 8332, testnet: 18332).
+	\item[bitcoind-cli] Provides a command-line interface to \emph{talk} to the daemon server.
+	\item[bitcoind-qt] Provides a graphical user interface to the Bitcoin peer and wallet (subset of the API as part of GUI but also provides a console for all calls).
+	\item[bitcoind-tx] Allows to create, parse or modify transactions.
+\end{description}
 
-%problems? exercises? computer excercises???
-% check historical records of hashrate and difficulty and see the adjustments...?
+\subsection*{Bitcoin software configuration and development environments}
+The configuration file is bitcoin.conf and its default location depends on the operating system used (e.g. in linux system it is located at ~/.bitcoin/bitcoin.conf). Some important options for development and testing\footnote{https://developer.bitcoin.org/examples/testing.html} your application include:
+
+\begin{description}
+	\item[deamon=1] Runs the Bitcoin node in the background.
+	\item[testnet=1] The Bitcoin node uses the testnet network for development (i.e. fake funds). If the option is missing or if it is `0' then mainnet (the real network) is used.
+	\item[regtest=1] This is a local test environment. The blockchain starts at height 0 (genesis block) and we can trivially mine new blocks with the \keyword{generatetoaddress} command. This allows developers to also control the block creation and get fake funds immediately. Regtest uses testnet’s network parameters (e.g. address prefixes, etc).
+\end{description}
+
+
+\subsection*{Examples of Calls using \keyword{bitcoin-cli}}
+
+To get help of all available commands and how to get further help:
+\begin{emphbox}
+\begin{lstlisting}[style=Bash]
+$ bitcoin-cli help
+\end{lstlisting}
+\end{emphbox}
+\vspace{1em}
+
+\noindent To get the current block height:
+\begin{emphbox}
+\begin{lstlisting}[style=Bash]
+$ bitcoin-cli getblockcount
+1806981
+\end{lstlisting}
+\end{emphbox}
+\vspace{1em}
+
+\noindent To get the current balance of all addresses:
+\begin{emphbox}
+\begin{lstlisting}[style=Bash]
+$ bitcoin-cli getbalance
+1.51815479
+\end{lstlisting}
+\end{emphbox}
+\vspace{1em}
+
+\noindent To get a new legacy\footnote{The typical P2PKH Addresses starting with \keyword{1} on mainnet and \keyword{m} or \keyword{n} on testnet.} address:
+\begin{emphbox}
+\begin{lstlisting}[style=Bash]
+$ bitcoin-cli getnewaddress "" legacy
+mvBGdiYC8jLumpJ142ghePYuY8kecQgeqS
+\end{lstlisting}
+\end{emphbox}
+\vspace{1em}
+
+\noindent To encrypt the wallet with a passphrase:
+\begin{emphbox}
+\begin{lstlisting}[style=Bash]
+$ bitcoin-cli walletencrypt PaSsPhRaSe
+wallet encrypted; Bitcoin server stopping, restart to run with encrypted 
+wallet. The keypool has been flushed and a new HD seed was generated (if 
+you are using HD). You need to make a new backup.
+\end{lstlisting}
+\end{emphbox}
+\vspace{1em}
+
+\noindent To unlock an encrypted wallet for 2 minutes to spend funds:
+\begin{emphbox}
+\begin{lstlisting}[style=Bash]
+$ bitcoin-cli walletpassphrase PaSsPhRaSe 120
+\end{lstlisting}
+\end{emphbox}
+\vspace{1em}
+
+\noindent To create a wallet backup:
+\begin{emphbox}
+\begin{lstlisting}[style=Bash]
+$ bitcoin-cli backupwallet wallet.backup
+\end{lstlisting}
+\end{emphbox}
+\vspace{1em}
+
+\noindent To import a backed up wallet:
+\begin{emphbox}
+\begin{lstlisting}[style=Bash]
+$ bitcoin-cli importwallet wallet.backup
+\end{lstlisting}
+\end{emphbox}
+\vspace{1em}
+
+\noindent To send 0.01 BTC to address \keyword{mvBGdiYC8jLumpJ142ghePYuY8kecQgeqS} without specifying which UTXOs to use\footnote{You can check the transaction online using a Bitcoin testnet block explorer: https://blockstream.info/testnet/tx/ff8322626c21c5bdfa1d27f75a55a1cb1d3b764bb34063f64b38f0803c370c08}:
+\begin{emphbox}
+\begin{lstlisting}[style=Bash]
+$ bitcoin-cli sendtoaddress mvBGdiYC8jLumpJ142ghePYuY8kecQgeqS 0.01
+ff8322626c21c5bdfa1d27f75a55a1cb1d3b764bb34063f64b38f0803c370c08
+\end{lstlisting}
+\end{emphbox}
+\vspace{1em}
+
+\noindent To display all UTXOs with at least 2 confirmations:
+\begin{emphbox}
+\begin{lstlisting}[style=Bash]
+$ bitcoin-cli listunspent 2
+[
+  {
+    "txid": "30d98980c56a139438f0c969ca30d4be2c7f865d098b905362263c5daca2afa7",
+    "vout": 0,
+    "address": "mgs9DLttzvWFkZ46YLSNKSZbgSNiMNUsdJ",
+    "amount": 1.01452015,
+    "confirmations": 20183,
+    ...
+  }
+... 
+]
+\end{lstlisting}
+\end{emphbox}
+\vspace{1em}
+
+\noindent To check all the available address labels:
+\begin{emphbox}
+\begin{lstlisting}[style=Bash]
+$ bitcoin-cli listlabels
+{
+  "": 1.01483854,
+  ...
+}
+\end{lstlisting}
+\end{emphbox}
+\vspace{1em}
+
+\noindent To check all addresses with a particular label:
+\begin{emphbox}
+\begin{lstlisting}[style=Bash]
+$ bitcoin-cli getaddressesbylabel
+{ 
+  "mvBGdiYC8jLumpJ142ghePYuY8kecQgeqS": {
+    "purpose": "receive"
+  },
+  ...
+}
+\end{lstlisting}
+\end{emphbox}
+\vspace{1em}
+
+To get more information for the status of your node you can use commands like: \keyword{getblockchaininfo}, \keyword{getmempoolinfo}, \keyword{gettxoutsetinfo}, \keyword{getmemoryinfo}, \keyword{getrpcinfo}, \keyword{getmininginfo}, \keyword{getnetworkinfo}, \keyword{getpeerinfo}, \keyword{getdescriptorinfo}, \keyword{getaddressinfo}, \keyword{getwalletinfo}.
+
+\section{Exercises}
+
+\begin{exercise}
+Prepare a bitcoin environment by installing a Bitcoin node configured for testnet. 
+\end{exercise}
+
+\begin{exercise}
+Using \keyword{bitcoin-cli} create a new legacy address.
+\end{exercise}
+
+\begin{exercise}
+Use a Bitcoin testnet faucet to get some testnet bitcoins (tBTC) to one of your addresses.
+\end{exercise}
+
+\begin{exercise}
+Ask your classmates or friends for their testnet address and send them some tBTC using \keyword{bitcoin-cli}.
+\end{exercise}
+
+\begin{exercise}
+Use a block explorer to see the status of the transaction that you created in the previous exercise.
+\end{exercise}
+
+\begin{exercise}
+Encrypt your wallet and back it up.
+\end{exercise}
+
+\begin{exercise}
+Go through the rest of the API and get familiar with more commands.
+\end{exercise}
+
+\begin{exercise}
+Search for historical data on Bitcoin's difficulty adjustments and make sure you understand what you see.
+\end{exercise}
 
 
