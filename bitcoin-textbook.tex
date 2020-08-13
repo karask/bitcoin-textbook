@@ -11,6 +11,14 @@
 
 % languages listings
 \usepackage{listings}
+
+% for greek in listings
+\usepackage{textgreek}
+\lstset{
+  literate={ε}{{\textepsilon}}1
+}
+
+% listing styles
 \lstdefinestyle{Pseudomath}
 {
   basicstyle=\ttfamily,
@@ -74,6 +82,8 @@
 % introduction
 \include{preface}
 \include{howbitcoinworks}
+\include{technicalfundamentals}
+\include{keysandaddresses}
 
 %---------------------------------------------------------------------------
 % Appendices?
