@@ -25,7 +25,7 @@ The WIFC will be 33 bytes long. The compression is happening when creating the p
 The following is pseudocode of the process that converts the private key to WIF.
 
 \begin{emphbox}
-\begin{lstlisting}[style=Pseudomath]
+\begin{lstlisting}[style=Pseudomath,label={lst:wif-pseudocode},caption={Pseudocode to convert a private key to the WIF format},captionpos=b]
 key_bytes = (32 bytes number) [ + 0x01 if compressed ]
 network_prefix = (1 byte version number)
 data = network_prefix + key_bytes
@@ -35,162 +35,90 @@ wif = Base58CheckEncode( data + checksum )
 \end{lstlisting}
 \end{emphbox}
 
-Note that all the above functions operate on big-endian bytes. The network prefix specifies the Bitcoin network that this private key would be used2. The Base58 WIF prefix depends on the network prefix and whether it is compressed or not, as shown in table~\ref{tab:privatekeyprefixes}.
+Note that all the above functions operate on big-endian bytes. The network prefix specifies the Bitcoin network that this private key would be used\footnote{The same private key can be of course used in both mainnet and testnet or even other compatible cryptocurrencies by using the appropriate prefix when generatig the WIF.}. The Base58 WIF prefix depends on the network prefix and whether it is compressed or not, as shown in table~\ref{tab:private-key-prefixes}.
 
+\begin{table}[h]
+\centering
+\begin{tabular}{ |l|c|c|c|c| }
+\hline
+~ & \multicolumn{2}{c|}{\textbf{Mainnet}} & \multicolumn{2}{c|}{\textbf{Testnet}} \\
+\hline
+ECDSA HEX & \multicolumn{2}{c|}{64 digits number} & \multicolumn{2}{c|}{64 digits number} \\
+\hline
+ECDSA HEX-C & \multicolumn{2}{c|}{Above number + ``01''} & \multicolumn{2}{c|}{Above number + ``01''} \\
+\hline
+~ & \textbf{Network Prefix} & \textbf{Base58 Prefix} & \textbf{Network Prefix} & \textbf{Base58 Prefix} \\
+\hline
+WIF & 128 | 0x80 & 5 & 239 | 0xef & 9 \\
+\hline
+WIF-C & 128 | 0x80 & K or L & 239 | 0xef & c \\
+\hline
+\end{tabular}
+\caption{Private keys network prefixes}
+\label{tab:private-key-prefixes}
+\end{table}
 
+As an example let us use the following hexadecimal number\footnote{In decimal: 6273083586486421860511804118443655246000698298582245067579657211. It is important to understand that a random number with enough entropy is required for your private key to be secure. A number representing your date of birth or your name’s characters, etc. will be found immediately by software and you will lose your funds.}:
 
+\begin{emphbox}
+0dde70823a4bb0ca3bd75a2010e8d5dc091185e73d8b4257a981c695a3eba95b
+\end{emphbox}
 
+You can now consult table~\ref{tab:private-key-example} for its compressed version and the corresponding WIF and WIF-C.
 
+\begin{table}[h]
+\centering
+\begin{tabular}{ |l|l| }
+\hline
+HEX & 0dde70823a4bb0ca3bd75a2010e8d5dc091185e73d8b4257a981c695a3eba95b \\
+\hline
+HEX-C & 0dde70823a4bb0ca3bd75a2010e8d5dc091185e73d8b4257a981c695a3eba95b\textbf{01} \\
+\hline
+WIF & 91h2ReUJRwJhTNd828zhc8RRVMU4krX9q3LNi4nVfiVwkMPfA9p \\
+\hline
+WIF-C & cN3fHnPVw4h7ZQSRz2HgE3ko69LTaZa5y3JWpFhoXtAke4MiqVQo \\
+\hline
+\end{tabular}
+\caption{Private key network prefix examples}
+\label{tab:private-key-example}
+\end{table}
 
-
-Computers internally use the binary numeral system that consists of only two symbols: 0 and 1. A binary digit, or bit, is the basic unit of binary. Eventually, everything is represented in bits.
-
-For ease of processing, bits are aggregated into bytes. Each byte consists of 8 bits. Thus, \keyword{01000001} represents a single byte. It is difficult (and much longer) to use/type binary, thus we typically use the hexadecimal numeral system or hex to represent bytes in a more human-friendly way. Hex has 16 possible symbols from 0 to F (0-9 and A-F). To represent 16 symbols we need exactly 4 bits (0 is 0000, 1 is 0001, …, F is 1111) and thus each byte can be represented by two hex digits. For example, \keyword{01000001} is equivalent to \keyword{41} in hexadecimal (0100 is hex number 4 and 0001 is hex number 1). You can experiment with conversions between binary, hexadecimal and decimal using various online tools\footnote{https://www.rapidtables.com/convert/number/binary-to-hex.html}.
+Let's use the bitcoin-utils library to construct the WIF and WIFC.
 
 \vspace{1em}
-\begin{lstlisting}[style=Python,label={lst:encodings-1},caption={Python examples},captionpos=b]
->>> format(0, '04b')      # converts decimal 0 to binary with 0 padding for 4 bits
-'0000'
->>> format(15, '04b')     # same for decimal 15
-'1111'
->>> format(15, 'X')       # convert decimal 15 to hex string
-'F'
->>> format(0x41, '08b')   # converts hex number 41 to binary with 0 padding for
-                          # 8 bits
-'01000001'
->>> 0x41                  # converts hex number 41 to decimal
-65
->>> 0x41 == '41'          # compares hex number 41 with string 41
-False
->>> b'41' == '41'         # compares byte literal 41 with string 41
-False
+\begin{lstlisting}[style=Python,label={lst:construct-wif},caption={Example of Creating WIF and WIFC using Python},captionpos=b]
+>>> from bitcoinutils.setup import setup
+>>> from bitcoinutils.keys import PrivateKey
+>>> setup('testnet')                                   # use testnet parameters
+'testnet'
+>>> secret_exponent = 0x0dde70823a4bb0ca3bd75a2010e8d5dc091185e73d8b4257a981c695a3eba95b
+>>> priv = PrivateKey(secret_exponent)
+>>> priv.to_wif(compressed=False)
+'91h2ReUJRwJhTNd828zhc8RRVMU4krX9q3LNi4nVfiVwkMPfA9p'
+>>> priv.to_wif(compressed=True)                       # the default
+'cN3fHnPVw4h7ZQSRz2HgE3ko69LTaZa5y3JWpFhoXtAke4MiqVQo'
 \end{lstlisting}
 \vspace{1em}
 
-One byte can represent up to $2^8=256$ numbers (0-255). Several bytes are needed to represent larger numbers. For example, decimal number 1000 is \keyword{1111101000} in binary which requires 10 bits. Computers operate at the byte level and thus 2 bytes (or 16 bits) will be required to represent this number; binary: \keyword{0000001111101000} and hex: \keyword{03E8}. Note that the byte ordering is important and it is called endianness\footnote{https://en.wikipedia.org/wiki/Endianness}. The above example uses big-endian ordering, where the most significant byte comes first and the least significant byte comes last. This is the same way we order numbers in languages (in left-to-right scripts\footnote{https://en.wikipedia.org/wiki/Writing\_system\#Directionality}). In little-endian the same number would be represented as \keyword{1110100000000011} and \keyword{E803}.
+The actual Python implementation of the functionality demonstrated above can be found at \keyword{to\_wif()}\footnote{\url{https://github.com/karask/python-bitcoin-utils/blob/42875a3fa90d267f2e5e17e017cb28fc8a90c5a8/bitcoinutils/keys.py\#L169-L193}} on github. You can also check how we can get to the private key bytes from WIF in \keyword{\_from\_wif()}\footnote{\url{https://github.com/karask/python-bitcoin-utils/blob/42875a3fa90d267f2e5e17e017cb28fc8a90c5a8/bitcoinutils/keys.py\#L129-L166}}. Feel free to consult the rest of the code and/or the examples in the repository.
 
-\vspace{1em}
-\begin{lstlisting}[style=Python,label={lst:encodings-2},caption={Python examples},captionpos=b]
->>> import binascii
->>> format(0x03E8, '016b')           # convert hex number 03E8 to binary digits
-                                     # with 0 padding for 16 bits
-'0000001111101000'
->>> format(int('03E8', 16), '016b')  # convert hex string '03E8' to binary digits 
-                                     # as above
-'0000001111101000'
->>> binascii.unhexlify('03E8')       # convert hex string 03E8 to binary
-b'\x03\xe8'
->>> b'\x03\xe8'[::-1]                # reverse bytes to change endianness
-b'\xe8\x03'
+Another tool that you can use from the command line is BX\footnote{https://github.com/libbitcoin/libbitcoin-explorer/wiki/Download-BX}. It has extensive capabilities including creating WIFs.
+
+\begin{emphbox}
+\begin{lstlisting}[style=Bash]
+$ ./bx base58check-encode --version 239 \\
+0dde70823a4bb0ca3bd75a2010e8d5dc091185e73d8b4257a981c695a3eba95b
+91h2ReUJRwJhTNd828zhc8RRVMU4krX9q3LNi4nVfiVwkMPfA9p
+
+$ ./bx base58check-encode --version 239 \\
+0dde70823a4bb0ca3bd75a2010e8d5dc091185e73d8b4257a981c695a3eba95b01
+cN3fHnPVw4h7ZQSRz2HgE3ko69LTaZa5y3JWpFhoXtAke4MiqVQo
 \end{lstlisting}
-\vspace{1em}
+\end{emphbox}
 
 
-\begin{note}
-Internally Bitcoin uses little-endian byte order as it improves speed (most computers use little-endian byte ordering internally). Most hash function libraries (see next section) create hashes using big-endian and Bitcoin transmits those in that ordering. However, when hashes are displayed Bitcoin uses little-endian order! The latter might be because it treats them as integers to compare them faster.
-\end{note}
+\section{Public Keys}
+In ECDSA a public key is generated from the private key. Elliptic curves operate over finite fields\footnote{https://en.wikipedia.org/wiki/Finite\_field} and thus all points on the curve are limited to integer coordinates; a finite field is typically accomplished by applying modulo p, where p is a prime number. The specific curve that Bitcoin uses (secp256k1) is  $y^2 = x^3 + 7$ . Then the public key P is generated by multiplying, using elliptic curve multiplication, the private key k with a special constant G called the generator point\footnote{This is a special point in the elliptic curve that is pre-defined in secp256k1.}: P = k * G. Elliptic curve multiplication of an integer with a point results in another point in the curve, which is the public key.
 
-As we already mentioned computers only know about binary. To display these numbers for human consumption we need to convert them into characters (i.e. text). In order to accomplish that we need character encodings that provide mappings between bit sequences and characters. Examples of such encodings are ASCII and UTF-8. UTF-8 is widely used nowadays and it provides an 8-bit mapping between (binary) numbers and characters. For example, character \keyword{A} is mapped to \keyword{01000001}. You can experiment with such encodings with online tools\footnote{https://www.rapidtables.com/convert/number/ascii-to-binary.html}.
-
-\vspace{1em}
-\begin{lstlisting}[style=Python,label={lst:encodings-3},caption={Python examples},captionpos=b]
->>> import binasci
->>> 'A' == b'A'                      # A character is not a byte
-False
->>> b'41' == '41'.encode('utf-8')    # Unicode string literals are stored internally
-                                     # in binary for efficiency
-True
->>> 'ε'.encode()                     # UTF-8 (the default) is a variable lenth
-                                     # encoding - 'ε' is stored as two bytes
-b'\xce\xb5'
->>> '41'.encode()                    # converts UTF-8 string literal 41 to binary -
-                                     # '4' and '1' occupy 1 byte each
-b'41'
->>> binascii.unhexlify('41')         # converts string hex value 41 to binary - 
-                                     # the UTF-8 value for 'A' is 0x41
-b'A'
->>> b'A' == b'\x41'                  # the bytes from 0x01 to 0x7f are confusingly
-                                     # specified with UTF-8 characters
-True
->>> b'41' == b'\x34\x31'             # similarly for binary characters b'4' and
-                                     # b'1' or b'41'
-True
->>> b'A'.decode('utf-8')             # convert binary to characters for displaying
-                                     # according to UTF-8 encoding
-'A'
->>> binascii.hexlify(b'A')           # convert binary value to hex value (expressed
-                                     # in binary)
-b'41'
->>> b'41'.decode()                   # decode to get as string (UTF-8 is the default)
-'41'
->>> b'\xce\xb5'.decode()             # convert from bytes to UTF-8 characters (0xce
-                                     # 0xb5 maps to 'ε')
-'ε'
-\end{lstlisting}
-\vspace{1em}
-
-
-\section{Cryptographic Hash Functions}
-A cryptographic hash function is a hash function that is suitable for cryptography. It is an one-way function that takes an arbitrary block of data and returns a fixed-size bit array, that is called the hash value or digest or digital fingerprint or just hash. It has the following properties:
-
-\begin{itemize}
-\item it is deterministic, i.e. the same block of data always returns the same hash
-\item it is quick to compute
-\item it is an one-way function; given the hash one cannot derive the original value unless they brute-force all possible values (which is close to impossible for large data sets)
-\item even a trivial change to the original data will change the resulting hash completely (it will appear uncorrelated to the previous hash)
-\item it is collision resistant; it is computational infeasible to find two different blocks of data with the same hash value
-\end{itemize}
-
-\vspace{1em}
-\begin{lstlisting}[style=Python,label={lst:encodings-4},caption={Python examples},captionpos=b]
->>> import hashlib
->>> import binascii
->>> b1 = 'Bitcoin'.encode('utf-8')   # convert string to bytes according to UTF-8 
-                                     # encoding
->>> b1
-b'Bitcoin'
->>> h1 = hashlib.sha256(b1).digest() # calculate the hash (or digest) of b1
->>> h1
-b'\xb4\x05m\xf6i\x1f\x8d\xc7.V0-\xda\xd3E\xd6_\xea\xd3\xea\xd9)\x96\t\xa8&\xe24N' \
-b'\xb6:\xa4'
->>> binascii.hexlify(h1).decode()    # converts bytes to hex (expressed in binary)
-                                     # and then to string to display
-'b4056df6691f8dc72e56302ddad345d65fead3ead9299609a826e2344eb63aa4'
->>> b2 = 'bitcoin'.encode('utf-8')   # convert string to bytes according to UTF-8
-                                     #encoding
->>> b2
-b'bitcoin'
->>> h2 = hashlib.sha256(b2).digest() # calculate the hash (or digest) of b2
->>> h2
-b'k\x88\xc0\x87$z\xa2\xf0~\xe1\xc5\x95k\x8e\x1a\x9fL\x7f\x89*p\xe3$\xf1\xbb=\x16' \
-b'\x1e\x05\xca\x10{'
->>> binascii.hexlify(h2).decode()    # converts bytes to hex (expressed in binary)
-                                     # and then to string to display
-'6b88c087247aa2f07ee1c5956b8e1a9f4c7f892a70e324f1bb3d161e05ca107b'
-\end{lstlisting}
-\vspace{1em}
-
-Cryptographic hash functions are very important in information security systems. They are used in digital signatures, message authentication codes and as ordinary (but more secure) hash functions to index data in hash tables, to uniquely identify files (bittorrent, IPFS), as checksums to detect accidental (or not) corruption of data, etc.
-
-\begin{note}
-	Bitcoin is using two hashing functions: SHA-256\footnote{https://en.wikipedia.org/wiki/SHA-2} and RIPEMD-160\footnote{https://en.wikipedia.org/wiki/RIPEMD} which create a hash value of 256 and 160 bits respectively (or 32 and 20 bytes or 64 and 40 hex characters).
-\end{note}
-
-\section{Asymmetric Cryptography}
-Asymmetric cryptography or public key cryptography\footnote{https://en.wikipedia.org/wiki/Public-key\_cryptography} is a cryptographic system that uses pairs of keys with a specific mathematical relation. In each pair there is a private key that should remain private and a public key that can be freely shared. Between two participants this allows:
-
-\begin{itemize}
-\item Encryption: Alice can encrypt a message with Bob’s public key and send it to Bob. Only the owner of the corresponding private key can decrypt and view the message.
-\item Authentication / Digital Signatures: Alice can sign a message using her private key and send it to Bob. Anyone can view the contents and verify the signature using Alice’s public key, thus ensuring that it was indeed Alice that send the message.
-\item Integrity: While anyone can view the contents of a signed message no one can modify it since the signature will be invalidated.
-\item Non-Repudiation: Signing or encrypting a message cannot be refuted by the author once the message has been sent, assuming the private key is secure.
-\end{itemize}
-
-
-\begin{note}
-Bitcoin does not use encryption at all. Digital signatures are used to sign transactions in order to authenticate that you are the owner of the coins you wish to transfer. Integrity and non-repudiation apply as well to transaction signing.
-\end{note}
-
-There are several different algorithms for asymmetric cryptography, like RSA\footnote{https://en.wikipedia.org/wiki/RSA\_(cryptosystem)} and ECDSA\footnote{https://en.wikipedia.org/wiki/Elliptic\_Curve\_Digital\_Signature\_Algorithm}. ECDSA, which Bitcoin uses, has the property that a private key can be used to calculate the corresponding public key.
 
 
