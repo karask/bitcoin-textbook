@@ -176,7 +176,7 @@ $ ./bx wif-to-public cN3fHnPVw4h7ZQSRz2HgE3ko69LTaZa5y3JWpFhoXtAke4MiqVQo
 
 
 \section{Addresses}
-Addresses can be shared to anyone who wants to sent you money. They are typically generated from the public key, consist of a sequence of characters and digits and start with 1 for the mainnet and with m or n for testnet\footnote{Or for segwit addresses bc and tb for mainnet and testnet respectively.}.
+Addresses can be shared to anyone who wants to sent you money. They are typically generated from the public key, consist of a sequence of characters and digits and start with 1 for the mainnet and with m or n for testnet\footnote{Or for segwit addresses bc1 and tb1 for mainnet and testnet respectively.}.
 
 An address typically represents the owner of a private/public pair but it can also represent a more complex script as we will see in a future chapter.
 
@@ -188,7 +188,8 @@ Notice that we do not share the public key as one would expect in public key cry
 \end{itemize}
 
 
-\subsection{Legacy Addresses}
+\subsection*{Legacy Addresses}
+
 An address is really just the hash of the public key, called public key hash (or PKH). That is how it is represented on the blockchain. The way we format addresses to display them (starting with 1, m/n, etc.) are just for our convenience. The format that we use is the Base58Check encoding of the public key hash; Base58 with version prefix to specify the network and a 32-bit checksum.
 
 The following is pseudocode of the process that converts the public key to public key hash and then address:
@@ -224,12 +225,12 @@ P2SH & 5 | 0x05 & 3 & 196 | 0xc4 & 2 \\
 \label{tab:address-prefixes}
 \end{table}
 
-	\keyword{P2PKH} stands for Pay to Public Key Hash and is the typical legacy address. \keyword{P2SH} stands for Pay to Script Hash and is the typical legacy script hash address.
+\keyword{P2PKH} stands for Pay to Public Key Hash and is the typical legacy address. \keyword{P2SH} stands for Pay to Script Hash and is the typical legacy script hash address.
 
 Let's use the bitcoin-utils library to construct some addresses; compressed and uncompressed.
 
 \vspace{1em}
-\begin{lstlisting}[style=Python,label={lst:display-public-keys},caption={Example of getting compressed and uncompressed public keys using Python},captionpos=b]
+\begin{lstlisting}[style=Python,label={lst:display-addresses},caption={Example of displaying the addresses of compressed and uncompressed public keys using Python},captionpos=b]
 >>> from bitcoinutils.setup import setup
 >>> from bitcoinutils.keys import PrivateKey, PublicKey, P2pkhAddress
 >>> setup('testnet')
@@ -251,4 +252,55 @@ Since the hash of a compressed public key would be different from the hash of an
 
 The actual python implepmentation of converting a public key hash (the application of SHA256 and then RIPEMD160, also called HASH160) can be found at \keyword{\_to\_hash160()} on github\footnote{\url{https://github.com/karask/python-bitcoin-utils/blob/52b7d906f2db8ec4ed4945a04b7e4da2d1db369c/bitcoinutils/keys.py\\\\\\\\#L589-L597}}. For code to convert from public key hash to address consult \keyword{to\_string()}\footnote{\url{https://github.com/karask/python-bitcoin-utils/blob/52b7d906f2db8ec4ed4945a04b7e4da2d1db369c/bitcoinutils/keys.py\#L802-L824}}. Feel free to consult the rest of the code and/or the examples in the repository for segwit address creation, etc.
 
-\subsection{Native Segregated Witness Addresses}
+
+\subsection*{Native Segregated Witness Addresses}
+
+Segregated Witness (segwit) is a consensus change that was activated in August 2017 and introduces an update on how transactions are constructed. It introduces two new transaction types, Pay-to-Witness-Public-Key-Hash (P2WPKH) and Pay-to-Witness-Script-Hash (P2WSH). These new transaction types are going to be explained in detail in a future chapter.
+%TODO FUTURE CHAPTER
+
+Native segwit addresses use a different format to display the public key hash called Bech32 encoding\footnote{https://github.com/bitcoin/bips/blob/master/bip-0173.mediawiki} (instead of Base58check). For code implementation look at the python reference implementation\footnote{https://github.com/karask/python-bitcoin-utils/blob/52b7d906f2db8ec4ed4945a04b7e4da2d1db369c/bitcoinutils/bech32.py} by Pieter Wuille.
+
+The network prefix specifies the Bitcoin network that this address would be used. Specifically, mainnet addresses start with \keyword{bc1}, testnet with \keyword{tb1} and regtest\footnote{Legacy addresses use the same prefix as testnet.} with \keyword{bcrt1}. The size of the address differentiates between public key hashes and script hashes; P2WPKH are 20 bytes long and P2WSH are 32 bytes long.
+
+Let's use the bitcoin-utils library to construct a segwit address.
+
+\vspace{1em}
+\begin{lstlisting}[style=Python,label={lst:display-segwit-address},caption={Example of displaying a segwit address from a public key using Python},captionpos=b]
+>>> from bitcoinutils.setup import setup
+>>> from bitcoinutils.keys import PrivateKey, PublicKey, P2wpkhAddress
+>>> setup('testnet')
+'testnet' 
+>>> priv = PrivateKey.from_wif('91h2ReUJRwJhTNd828zhc8RRVMU4krX9q3LNi4nVfiVwkMPfA9p')
+>>> pub = priv.get_public_key()  
+>>> addr = pub.get_segwit_address()
+>>> addr.to_string() 
+'tb1q7m6ak6k050sxzxjjekhey73k0f3rqnxsqa08k2'
+\end{lstlisting}
+\vspace{1em}
+
+
+
+\subsection*{Nested Segregated Witness Addresses}
+
+When segwit was introduced a lot of wallets did not support the new bech32 addresses so users could not use those to send funds to segwit addresses. To remedy that, nested segwit addresses could be used.
+
+Effectively you could nest or wrap a segwit address into a P2SH address. As already mentioned P2SH addresses can be created from arbitrary scripts and thus could also include a witness script. Again, P2SH and segwit are outside our scope for now and will be explained in more detail in a later chapter.
+%TODO FUTURE CHAPTER
+
+\begin{note}
+After the segwit upgrade one needs to choose the type of address to create (e.g. with \keyword{getnewaddress}. The supported types where \keyword{legacy}, \keyword{p2sh-segwit} and \keyword{bech32}. The default, starting from version 0.16.0, is nested addresses (\keyword{p2sh-segwit}).
+\end{note}
+
+
+\section{Wallets}
+
+A wallet is software that allows us to manage the private and public keys as well as our Bitcoin addresses. They usually have functionality to send bitcoins, check balances, create contact lists and other. Usually a key (i.e. address) is used only once. Depending on how the private keys are handled there are two types of wallets:
+
+\begin{description}
+\item[Non-deterministic] All the private keys on the wallet are just randomly generated. Several private keys are pre-generated and new keys are created if needed. If you backup your wallet and then create new keys, you will need to backup your wallet again.
+\item[Deterministic] A seed is used to create a master private key, which can be used to create all other private keys (thus public keys and addresses as well). If you backup your seed you are safe no matter how many keys you use since all can be generated from the seed.
+\end{description}
+
+Nowadays, most wallets are \emph{Hierarchical Deterministic (HD)} since they offer more flexibility, easier backups and enchanced security in certain use cases. HD wallets are described in detail in \emph{Bitcoin Improvement Proposals (BIPs)} 32\footnote{https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki}, 43\footnote{https://github.com/bitcoin/bips/blob/master/bip-0043.mediawiki} and 44\footnote{https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki}. 
+
+
