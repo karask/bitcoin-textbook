@@ -62,6 +62,13 @@ contents={\includegraphics[width=\paperwidth,height=\paperheight]{cover}}}
 \renewcommand{\headrulewidth}{0pt}
 \renewcommand{\footrulewidth}{0pt}
 
+% Tables new column formats
+%--------------------------------------------------------------------------
+\RequirePackage{array}
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+
 % Section styling
 %--------------------------------------------------------------------------
 \RequirePackage{sectsty}

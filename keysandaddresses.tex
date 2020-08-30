@@ -176,6 +176,7 @@ $ ./bx wif-to-public cN3fHnPVw4h7ZQSRz2HgE3ko69LTaZa5y3JWpFhoXtAke4MiqVQo
 
 
 \section{Addresses}
+\label{sec:addresses}
 Addresses can be shared to anyone who wants to sent you money. They are typically generated from the public key, consist of a sequence of characters and digits and start with 1 for the mainnet and with m or n for testnet\footnote{Or for segwit addresses bc1 and tb1 for mainnet and testnet respectively.}.
 
 An address typically represents the owner of a private/public pair but it can also represent a more complex script as we will see in a future chapter.
@@ -184,9 +185,12 @@ Notice that we do not share the public key as one would expect in public key cry
 
 \begin{itemize}
 \item shorter addresses
-\item quantum computer resistance\footnote{Until one spends from an address the public key will never appear on the blockchain and thus to potential attackers and since the address is hashed from the public key not even quantum computers could (arguably) brute force to get the public key and then the private key. Note, however, that even if that is the case the majority of addresses would be hacked thus destroying trust in (and the value of) the network anyway!}
+\item quantum computer resistance
 \end{itemize}
 
+\begin{note}
+Until one spends from an address the public key will never appear on the blockchain and thus to potential attackers and since the address is hashed from the public key not even quantum computers could, arguably, brute force to get the public key and then the private key. Note, however, that even if that is the case the majority of addresses would be hacked thus destroying trust in (and the value of) the network anyway!
+\end{note}
 
 \subsection*{Legacy Addresses}
 
@@ -250,7 +254,7 @@ Let's use the bitcoin-utils library to construct some addresses; compressed and 
 Since the hash of a compressed public key would be different from the hash of an uncompressed public key we have two distinct legacy addresses.
 \end{note}
 
-The actual python implepmentation of converting a public key hash (the application of SHA256 and then RIPEMD160, also called HASH160) can be found at \keyword{\_to\_hash160()} on github\footnote{\url{https://github.com/karask/python-bitcoin-utils/blob/52b7d906f2db8ec4ed4945a04b7e4da2d1db369c/bitcoinutils/keys.py\\\\\\\\#L589-L597}}. For code to convert from public key hash to address consult \keyword{to\_string()}\footnote{\url{https://github.com/karask/python-bitcoin-utils/blob/52b7d906f2db8ec4ed4945a04b7e4da2d1db369c/bitcoinutils/keys.py\#L802-L824}}. Feel free to consult the rest of the code and/or the examples in the repository for segwit address creation, etc.
+The actual python implepmentation of converting a public key hash (the application of SHA256 and then RIPEMD160, also called HASH160) can be found at \keyword{\_to\_hash160()} on github\footnote{\url{https://github.com/karask/python-bitcoin-utils/blob/52b7d906f2db8ec4ed4945a04b7e4da2d1db369c/bitcoinutils/keys.py\#L589-L597}}. For code to convert from public key hash to address consult \keyword{to\_string()}\footnote{\url{https://github.com/karask/python-bitcoin-utils/blob/52b7d906f2db8ec4ed4945a04b7e4da2d1db369c/bitcoinutils/keys.py\#L802-L824}}. Feel free to consult the rest of the code and/or the examples in the repository for segwit address creation, etc.
 
 
 \subsection*{Native Segregated Witness Addresses}
