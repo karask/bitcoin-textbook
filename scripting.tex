@@ -61,11 +61,11 @@ Using the private key we provide an ECDSA signature of part of the transaction t
 The validation to spend a UTXO consists of running the script of \keyword{scriptSig} plus \keyword{scriptPubKey}. Both scripts are added in the stack and executed as one script.
 
 \subsection*{Validation of P2PKH Spending}
-The validation process is described in table~\ref{tab:p2pkh-validation} where a step by step walkthrough is provided as the script is executed. In each step the script element evaluated will be highlighted (left column) and the current stack (right column) will also be displayed.
+The validation process is described in below in a step by step explanation during script execution. In each step the script element evaluated will be highlighted (left column) and the current stack (right column) will also be displayed.
 
-\begin{table}
+%\begin{table}
 \begin{center}
-\begin{tabular}{ |L{0.47\linewidth}|L{0.47\linewidth}| }
+\begin{longtable}[H]{ |L{0.47\linewidth}|L{0.47\linewidth}| }
 \hline
 \multicolumn{2}{|l|}{\emph{Step 0: Execution starts. Stack is empty.}}\\
 \hline
@@ -106,35 +106,25 @@ The validation process is described in table~\ref{tab:p2pkh-validation} where a 
 \hline
 \textsf{<Signature> <PublicKey> OP\_DUP OP\_HASH160 <PKHash> OP\_EQUALVERIFY {\color{blue}OP\_CHECKSIG}} & \textsf{OP\_TRUE} \\
 \hline
-\end{tabular}
-\caption{Validation steps of P2PKH}
-\label{tab:p2pkh-validation}
+\end{longtable}
+%\caption{Validation steps of P2PKH}
+%\label{tab:p2pkh-validation}
 \end{center}
-\end{table}
+%\end{table}
 
+Since the script finished and the only element in the stack is now \keyword{OP\_TRUE}\footnote{Or OP\_1, i.e. true. All the operators, or opcodes, and their explanations can be found at https://en.bitcoin.it/wiki/Script} the node validated ownership of the UTXO and it is allowed to be spent. Success!
 
+To help clarify how addresses, locking scripts and UTXOs relate please see figure~\ref{fig:utxos-pkhashes-addresses}. Addresses 1Zed, 1Alice and 1Bob are short for the actual bitcoin addresses of Zed, Alice and Bob respectively. The diagram emphasises what happens when funds are sent to an address.
+\vspace{1em}
 
-%\begin{emphbox}
-%\begin{lstlisting}[style=Pseudomath]
-%    $TX_x$: 1Zed transfers 1.5 BTC to 1Alice
-%    $TX_y$: 1Alice transfers 1 BTC to 1Bob
-%\end{lstlisting}
-%\end{emphbox}
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale=0.5]{images/utxos-pkhashes-addresses}
+\caption{UTXOs, PKHashes and Addresses relationships.}
+\label{fig:utxos-pkhashes-addresses}
+\end{center}
+\end{figure}
 
-%\begin{figure}[h]
-%\begin{center}
-%\includegraphics[scale=0.5]{images/typical-transaction}
-%\caption{Typical one input two outputs transaction.}
-%\label{fig:typical-transaction}
-%\end{center}
-%\end{figure}
+This section explained how funds residing in UTXOs are locked/unlocked and how scripts are evaluated for validation. In the next section we will go through several examples of how we can create simple transactions programmatically.
 
-%The amount of all the inputs needs to be greater or equal to the amounts of outputs. If greater (recommended) the difference is an implied transaction fee that goes to the miners (see figure~\ref{fig:typical-transaction}). A typical transaction transfers some bitcoins to another user and returns the remaining bitcoins as change to the originating address or another address that the sender controls.
-
-%\small
-%\begin{emphbox}
-%\begin{lstlisting}[style=Pseudomath]
-%0x00000000ffff0000000000000000000000000000000000000000000000000000
-%\end{lstlisting}
-%\end{emphbox}
-%\normalsize
+\raggedbottom
