@@ -308,3 +308,39 @@ A wallet is software that allows us to manage the private and public keys as wel
 Nowadays, most wallets are \emph{Hierarchical Deterministic (HD)} since they offer more flexibility, easier backups and enchanced security in certain use cases. HD wallets are described in detail in \emph{Bitcoin Improvement Proposals (BIPs)} 32\footnote{https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki}, 43\footnote{https://github.com/bitcoin/bips/blob/master/bip-0043.mediawiki} and 44\footnote{https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki}. 
 
 
+\section{More examples using the \keyword{bitcoin-utils} library}
+This section will provide multitude of examples of how to create and use keys and addresses using the \keyword{bitcoin-utils} Python library.
+
+\subsection*{Create a P2SH-P2WPKH address}
+\keyword{TODO}
+
+\subsection*{Sign message with private key and verify}
+We can use a private key to sign a message. In asymmetric cryptography, the recipient can then use the corresponding public key to verify that the message was not tampered with.
+
+\vspace{1em}
+\begin{lstlisting}[style=Python,label={lst:sign-verify-message},caption={Use public key to sign a message and them verify},captionpos=b]
+>>> from bitcoinutils.setup import setup
+>>> from bitcoinutils.keys import P2pkhAddress, PrivateKey, PublicKey
+>>> setup('testnet')
+'testnet'
+>>> priv = PrivateKey.from_wif('91h2ReUJRwJhTNd828zhc8RRVMU4krX9q3LNi4nVfiVwkMPfA9p')
+>>> address = priv.get_public_key().get_address()
+>>> message = "The test!"
+>>> signature = priv.sign_message(message)
+>>> print("The signature is:", signature)
+The signature is: INzSwXNYNUkPFImslSFDzvqoib3ZdODcaBSZHvx5e4z1wc64cF1dVMZbDFtZxYBlD\\
+L/dsjK2iBD5qAf7VcmSdQo=
+>>> if PublicKey.verify_message(address.to_string(), signature, message):
+...     print("The signature is valid!")
+... else:
+...     print("The signature is NOT valid!")
+...
+The signature is valid!
+\end{lstlisting}
+\vspace{1em}
+
+\begin{note}
+We verify using the address instead of the public key. In ECDSA cryptography the public key can be reconstructed given the signature and the public key hash (or address).
+\end{note}
+
+
