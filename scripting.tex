@@ -451,3 +451,249 @@ For an example of \keyword{SINGLE}, consider creating the transaction shown abov
 \end{itemize}
 
 
+\section{Pay to script hash (P2SH)}
+
+This section explains the rationale behind Pay to Script Hash (P2SH) type of addresses and demonstrates with code.
+
+\subsection*{Multi-signature transaction output type}
+To demonstrate the advantages of P2SH we will first go through a simple use case using first the Multisignature standard transaction output type and then implement the same script with the P2SH standard transaction output type.
+
+Consider the scenario where we accept funds in an address that is not controlled by one person. For example it is typical for companies to allow spending from corporate accounts only if, say, 2 people agree. These are called multi-signature accounts. A multi-signature account requires M-of-N signatures in order to spend the funds. An address’ locking script could enforce that. For example a 2-of-3 multi-signature locking script would look like:
+
+\begin{emphbox}
+\begin{lstlisting}[style=Pseudomath]
+2 <Director's Public Key> <CFO's Public Key> <COO's Public Key> 
+3 CHECKMULTISIG
+\end{lstlisting}
+\end{emphbox}
+
+Indeed, this is the locking script of the multisignature standard transaction output type. If someone needs to send money (lock funds) to that output script then they need to know it! The company would need to send this script to all their customers that wish to pay them.
+
+This is not practical since the whole script is recorded on the blockchain for every transaction and more importantly has privacy issues; the company is revealing the public keys that control the funds.
+
+If you think about it the precise locking/unlocking script of the funds should not concern the customers at all. Only the company should know how to spend them.
+
+
+\subsection*{Pay to script hash (P2SH)}
+P2SH is a type of transaction output (BIP-16\footnote{https://github.com/bitcoin/bips/blob/master/bip-0016.mediawiki}) that moves the responsibility for supplying the conditions to redeem a transaction (locking script) from the sender of the funds to the redeemer (receiver).
+
+The locking script of such a transaction is quite simple:
+
+\begin{emphbox}
+\begin{lstlisting}[style=Pseudomath]
+OP_HASH160 [20-byte-hash-value] OP_EQUAL
+\end{lstlisting}
+\end{emphbox}
+
+The 20-byte hash value is the hash of the redeem script:
+
+\begin{emphbox}
+\begin{lstlisting}[style=Pseudomath]
+RIPEMD-160( SHA-256( 2 <Director's Public Key> <CFO's Public Key> 
+<COO's Public Key> 3 CHECKMULTISIG ) )
+\end{lstlisting}
+\end{emphbox}
+
+Using this hash we create a Bitcoin address (same process but instead of \keyword{OP\_HASH160(pubkey)} we use \keyword{OP\_HASH160(redeem script)}) using the version prefix of \keyword{0x05} that creates addresses that start with \keyword{3}. Consult this code for the details.
+
+We then only need to disseminate this address to the company’s customers. The can send funds oblivious to how these funds are locked. The company knows how they are unlocked so they can prepare the appropriate unlocking script.
+
+As an example, to spend the funds, the company can create the following script:
+
+\begin{emphbox}
+\begin{lstlisting}[style=Pseudomath]
+<Director's signature> <CFO's signature> 
+<2 <Director's Public Key> <CFO's Public Key> <COO's Public Key> 
+ 3 CHECKMULTISIG>
+\end{lstlisting}
+\end{emphbox}
+
+It has two parts, the redeem script’s unlocking conditions (which in this case are two of the signatures) plus the redeem script. Notice how the redeem script is revealed only when the company spends the funds; and it only reveals the two signatures, not all three.
+
+Validation occurs in 2 steps. First we confirm that the redeem script equals the hash in the locking script. Thus we take the second part of the unlocking script and prepend it to the unlocking script as is typically done:
+
+
+\begin{emphbox}
+\begin{lstlisting}[style=Pseudomath]
+<2 <Director's Public Key> <CFO's Public Key> <COO's Public Key>
+ 3 CHECKMULTISIG>  OP_HASH160 [20-byte-hash-value] OP_EQUAL
+\end{lstlisting}
+\end{emphbox}
+
+If the hashed redeem script is equal to the 20-byte hash value the above script will result \keyword{OP\_TRUE} and it validates that the correct redeem script was passed. We can now proceed in validating the actual redeem script using the first part of the unlocking script:
+
+\begin{emphbox}
+\begin{lstlisting}[style=Pseudomath]
+<Director's signature> <CFO's signature> 2 <Director's Public Key>
+<CFO's Public Key> <COO's Public Key> 3 CHECKMULTISIG
+\end{lstlisting}
+\end{emphbox}
+
+If that also results to \keyword{OP\_TRUE} then the funds can be spend.
+
+\subsection*{Summary / Advantages}
+P2SH moves the responsibility for supplying the conditions to redeem a transaction (locking script) from the sender of the funds to the redeemer (receiver).
+
+\begin{itemize}
+\item P2SH allows us to create arbitrary redeem scripts; we can thus create quite complex scripts and not be limited to the few standard transaction output types.
+\item Reduces the size of the funding transactions typically resulting in saving blockchain sace.
+\item Increases privacy by hiding the locking conditions.
+\end{itemize}
+
+\subsection*{Create a P2SH address based on a P2PK script}
+As we have seen P2SH allows us to wrap arbitrary scripts hiding the script itself until it is spend. To demonstrate we will wrap a simple P2PK script and display the P2SH address that corresponds to that script.
+
+\vspace{1em}
+\begin{lstlisting}[style=Python]
+from bitcoinutils.setup import setup
+from bitcoinutils.keys import P2shAddress, PrivateKey
+from bitcoinutils.script import Script
+
+
+def main():
+    # always remember to setup the network
+    setup('testnet')
+
+    #
+    # This script creates a P2SH address containing a P2PK locking script
+    #
+
+    # secret key corresponding to the pubkey needed for the P2PK locking
+    p2pk_sk = PrivateKey('cRvyLwCPLU88jsyj94L7iJjQX5C2f8koG4G2gevN4BeSGcEvfKe9')
+
+    # get the public key
+    p2pk_pk = p2pk_sk.get_public_key()
+
+    # get the address (from the public key)
+    p2pk_addr = p2pk_pk.get_address()
+
+    # create the redeem script
+    redeem_script = Script([p2pk_pk.to_hex(), 'OP_CHECKSIG'])
+
+    # create a P2SH address from a redeem script
+    addr = P2shAddress.from_script(redeem_script)
+    print(addr.to_string())
+
+if __name__ == "__main__":
+    main()
+\end{lstlisting}
+\vspace{1em}
+
+The result is address \keyword{2MvzN3FntupGqY66FuGzoK9HFXqPFyMxfVU} which can be shared to anyone that wishes to send us some funds.
+
+
+\subsection*{Spend funds from a P2SH address}
+Assuming that someone has sent funds to the P2SH address we just created let us spend it programmatically. In this example we will hardcode UTXOs for simplicity.
+
+\vspace{1em}
+\begin{lstlisting}[style=Python]
+from bitcoinutils.setup import setup
+from bitcoinutils.utils import to_satoshis
+from bitcoinutils.transactions import Transaction, TxInput, TxOutput
+from bitcoinutils.keys import P2pkhAddress, P2shAddress, PrivateKey
+from bitcoinutils.script import Script
+
+def main():
+    # always remember to setup the network
+    setup('testnet')
+
+    #
+    # This script spends from a P2SH address containing a P2PK script
+    #
+
+    # create transaction input from tx id of UTXO (contained 0.1 tBTC)
+    txin = TxInput('7db363d5a7fabb64ccce154e906588f1936f34481223ea8c1f2c935b0a0c945b', 0)
+
+    # secret key needed to spend P2PK that is wrapped by P2SH
+    p2pk_sk = PrivateKey('cRvyLwCPLU88jsyj94L7iJjQX5C2f8koG4G2gevN4BeSGcEvfKe9')
+    p2pk_pk = p2pk_sk.get_public_key().to_hex()
+    # create the redeem script - needed to sign the transaction
+    redeem_script = Script([p2pk_pk, 'OP_CHECKSIG'])
+
+    to_addr = P2pkhAddress('n4bkvTyU1dVdzsrhWBqBw8fEMbHjJvtmJR')
+    txout = TxOutput(to_satoshis(0.09), to_addr.to_script_pub_key() )
+
+    # no change address - the remaining 0.01 tBTC will go to miners)
+
+    # create transaction from inputs/outputs -- default locktime is used
+    tx = Transaction([txin], [txout])
+
+    # print raw transaction
+    print("\nRaw unsigned transaction:\n" + tx.serialize())
+
+    # use the private key corresponding to the address that contains the
+    # UTXO we are trying to spend to create the signature for the txin -
+    # note that the redeem script is passed to replace the scriptSig
+    sig = p2pk_sk.sign_input(tx, 0, redeem_script )
+
+    # set the scriptSig (unlocking script)
+    txin.script_sig = Script([sig, redeem_script.to_hex()])
+    signed_tx = tx.serialize()
+
+    # print raw signed transaction ready to be broadcasted
+    print("\nRaw signed transaction:\n" + signed_tx)
+    print("\nTxId:", tx.get_txid())
+
+
+if __name__ == "__main__":
+    main()
+\end{lstlisting}
+\vspace{1em}
+
+\begin{note}
+As already mentioned, the first time we spend from the address, i.e. broadcasting this transaction, reveals the redeem script to everyone.
+\end{note}
+
+
+
+\section{Segregated Witness (SegWit)}
+
+In this section we will briefly explain what Segregated Witness is, what it changes and how scripts can be created programmatically. 
+
+Segregated Witness is a consensus change that introduces an update on how transactions are constructed. In particular it separates (segregates) the unlocking script (witness) from the rest of the input; a transaction input does not contain an unlocking script anymore and the latter is found in another structure that goes alongside the transaction. 
+
+To illustrate see figure~\ref{fig:tx-with-without-segwit} (i) for the original transaction that we used as an example in chapter~\ref{ch:howbitcoinworks}. We can see that the unlocking script is part of the input that we are spending. In (ii) we can see the segwit equivalent transaction where the unlocking script (\keyword{scriptSig}) is empty and it is moved outside the transaction.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[scale=0.5]{images/tx-with-without-segwit}
+\caption{Example transaction with (i) a non-segwit input and (ii) a segwit input.}
+\label{fig:tx-with-without-segwit}
+\end{center}
+\end{figure}
+
+The segwit upgrade is described in detail in BIPs\footnote{Bitcoin Improvement Proposals} 141, 143, 144 and 145 and it provides several benefits\footnote{https://bitcoincore.org/en/2016/01/26/segwit-benefits/}. We will example two of them here: \emph{transaction malleability} and \emph{effective block size increase}.
+
+\subsection*{Transaction malleability}
+Each transaction is uniquely identified by its \emph{transaction identifier} or \keyword{txid}. The \keyword{txid} is constructed by hashing\footnote{The SHA-256 hashing algorithm is applied twice.} the serialized transaction (the blue part of figure~\ref{fig:tx-with-without-segwit}).
+
+It is possible to slightly change the unlocking script, e.g. my a miner,  so as the resulting transaction is semantically identical to the original, thus still valid. This can be accomplished, for example, by slightly changing the encoding format of the signature.
+
+That is a problem because given how the \keyword{txid} is created even the slighest modification will change the \keyword{txid}. While the transaction is identical, i.e. funds will be moved exactly as intended, our ability to monitor this transaction is problematic given that we will be checking for confirmations in a \keyword{txid} that is not valid anymore.
+
+With segwit inputs, however, the unlocking script (the green part of figure~\ref{fig:tx-with-without-segwit} (ii) ) is not part of the \keyword{txid} construction and thus it is impossible to modify it. A non-malleable \keyword{txid} is more reliable and allows for more advanced scripts/solutions like the lightning network.
+
+
+\subsection*{Effective block size increase}
+The actual block size remains the same, at 1MB. However, the unlocking scripts are now not part of the block and thus more transactions can fit into the 1MB limit.
+
+Segwit introduces the concept of block \emph{weight} a new metric for the size of blocks. A block can have a maximum of weight of 4MBs. The non-witness part bytes of a transaction are now multiplied by 4 to get its weight while the witness part bytes are multiplied by 1, a discount of 75\%. This allows for an effective block size increase of 1.8x.
+
+The \emph{virtual} size, or \keyword{vsize} of a transaction is the size in bytes of a transaction including the segwit discount. For non-segwit transactions\footnote{I.e. transaction with no segwit inputs.} \keyword{size} and \keyword{vsize} are identical.
+
+
+
+
+\section{Exercises}
+
+\begin{exercise}
+Write a Python function that goes through a serialized transaction and calculates what percentage of its size are the \keyword{scriptSig}s.
+\end{exercise}
+
+\begin{exercise}
+Write a script that goes through a block and prints the percentage of all the \keyword{scriptSig}s relative to the size of the block.
+\end{exercise}
+
+\begin{exercise}
+How can we calculate what the maximum \emph{effective} block size limit is with segwit?
+\end{exercise}
