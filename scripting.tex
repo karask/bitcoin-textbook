@@ -452,6 +452,7 @@ For an example of \keyword{SINGLE}, consider creating the transaction shown abov
 
 
 \section{Pay to script hash (P2SH)}
+\label{sec:p2sh}
 
 This section explains the rationale behind Pay to Script Hash (P2SH) type of addresses and demonstrates with code.
 
@@ -540,7 +541,7 @@ P2SH moves the responsibility for supplying the conditions to redeem a transacti
 \item Increases privacy by hiding the locking conditions.
 \end{itemize}
 
-\subsection*{Create a P2SH address based on a P2PK script}
+\subsection*{Example: create a P2SH address based on a P2PK script}
 As we have seen P2SH allows us to wrap arbitrary scripts hiding the script itself until it is spend. To demonstrate we will wrap a simple P2PK script and display the P2SH address that corresponds to that script.
 
 \vspace{1em}
@@ -582,7 +583,7 @@ if __name__ == "__main__":
 The result is address \keyword{2MvzN3FntupGqY66FuGzoK9HFXqPFyMxfVU} which can be shared to anyone that wishes to send us some funds.
 
 
-\subsection*{Spend funds from a P2SH address}
+\subsection*{Example: spend funds from a P2SH address}
 Assuming that someone has sent funds to the P2SH address we just created let us spend it programmatically. In this example we will hardcode UTXOs for simplicity.
 
 \vspace{1em}
@@ -682,6 +683,117 @@ Segwit introduces the concept of block \emph{weight} a new metric for the size o
 The \emph{virtual} size, or \keyword{vsize} of a transaction is the size in bytes of a transaction including the segwit discount. For non-segwit transactions\footnote{I.e. transaction with no segwit inputs.} \keyword{size} and \keyword{vsize} are identical.
 
 
+\subsection*{Segwit transaction output types}
+Segwit introduces two new transaction types, \emph{Pay-to-Witness-Public-Key-Hash (P2WPKH)} and \emph{Pay-to-Witness-Script-Hash (P2WSH)}, which are the segwit equivalent of P2PKH and P2SH respectively. They are sometimes called \emph{native} segwit to differentiate from \emph{nested} segwit.
+
+The locking script (\keyword{scriptPubKey}) of these new types consists of two elements, a \keyword{version byte} and the \keyword{witness program}. The version byte introduces versioning in the witness program of the script. That is another benefit of segwit, since it allows for easy updates based on a new version.
+
+Remember, that when signing to spend any output we need to provide the locking script, which is used to substitute the \keyword{scriptPubKey} before we calculate the transaction digest and sign it. For setwit transaction types each witness program corresponds to a predefined template script that is called \keyword{scriptCode}.
+
+\subsubsection*{P2WPKH}
+In segwit version 0, a P2WPKH witness program is just the 20-byte public key hash. The unlocking script (\keyword{scriptSig}) should be empty and the witness structure contains the unlocking script.
+
+\begin{emphbox}
+\begin{lstlisting}[style=Pseudomath]
+scriptPubKey: 0 6b85f9a17492c691c1d861cc1c722ff683b27f5a
+scriptSig:
+witness: <signature> <pubkey>
+\end{lstlisting}
+\end{emphbox}
+
+The validation is executed as follows:
+\begin{enumerate}
+\item The `0' in scriptPubKey specifies that the following is a version 0 witness program.
+\item The length of the witness program (20-bytes) indicates that it is a P2WPKH type.
+\item The witness program must consist of exactly two items.
+\item The \keyword{HASH160} of the <pubkey> must match the 20-bytes witness program.
+\item Finally, the signature is verified by: \keyword{<signature> <pubkey> CHECKSIG}.
+\end{enumerate}
+
+The \keyword{scriptCode} for P2WPKH is identical to P2PKH.
+
+
+\subsubsection*{P2WSH}
+In segwit version 0, a P2WSH witness program is just the 32-byte script hash. The unlocking script (\keyword{scriptSig}) should be empty and the witness structure contains the unlocking script as well as the \emph{witness script}\footnote{To clarify, witness script for a P2WSH is exactly what redeem script is for a P2SH.}.
+
+\begin{emphbox}
+\begin{lstlisting}[style=Pseudomath]
+scriptPubKey: 0 3b892c61cc15f9a17<32 bytes>c1c722ff683b27f5a
+scriptSig:
+witness: 0 <signature1> <1 <pubkey1> <pubkey2> 2 CHECKMULTISIG>
+\end{lstlisting}
+\end{emphbox}
+
+The validation is executed as follows:
+\begin{enumerate}
+\item The `0' in scriptPubKey specifies that the following is a version 0 witness program.
+\item The length of the witness program (32-bytes) indicates that it is a P2WSH type.
+\item The witness program must consist of the unlocking script followed by the witness script) 
+\item The \keyword{SHA256} of the witness script must match the 32-bytes witness program
+\item Finally, the witness script is deserialized and executed after the remaining witness stack: \keyword{0 <signature1> \emph{1 <pubkey1> <pubkey2> 2 CHECKMULTISIG}}.
+\end{enumerate}
+
+The \keyword{scriptCode} for P2WSH is the witness script.
+
+
+\subsection*{Nested Segwit transaction output types}
+It is possible for a non-segwit aware wallet to pay to a segwit address by embedding P2WPKH or P2WSH into a P2SH. The recipient will provide a P2SH address to the sender who can send funds as usual. The recipient can then use the redeem script which is actually the witness script to spend the funds.
+
+\subsubsection*{P2SH(P2WPKH)}
+Get the hash of the P2WPKH \keyword{scriptPubKey} and use it in P2SH as usual:
+
+\begin{emphbox}
+\begin{lstlisting}[style=Pseudomath]
+HASH160 (0 6b85f9a17492c691c1d861cc1c722ff683b27f5a)
+\end{lstlisting}
+\end{emphbox}
+
+And thus:
+
+\begin{emphbox}
+\begin{lstlisting}[style=Pseudomath]
+scriptPubKey: <HASH160 <20-byte-script-hash> EQUAL
+scriptSig: <0 <20-byte-key-hash>>
+witness: <signature> <pubkey>
+\end{lstlisting}
+\end{emphbox}
+
+Note that \keyword{scriptSig} contains the redeem script as a single element and without any extra unlocking data before it since those are in witness (check section~\ref{sec:p2sh} for how P2SH works). 
+
+For validation the \keyword{scriptSig} is hashed with \keyword{HASH160} and compared to the \keyword{<20-byte-script-hash>} in \keyword{scriptPubKey}. If they are equal we can then verify the public key and signature as a native P2WPKH.
+
+
+\subsubsection*{P2SH(P2WSH)}
+Get the hash of the P2WSH \keyword{scriptPubKey} and use it in P2SH as usual:
+
+\begin{emphbox}
+\begin{lstlisting}[style=Pseudomath]
+HASH160 (0 3b892c61cc15f9a17<32 bytes>c1c722ff683b27f5a)
+\end{lstlisting}
+\end{emphbox}
+
+And thus:
+
+\begin{emphbox}
+\begin{lstlisting}[style=Pseudomath]
+scriptPubKey: <HASH160 <20-byte-script-hash> EQUAL
+scriptSig: <0 <32-byte-witness-script-hash>>
+witness: 0 <signature1> <1 <pubkey1> <pubkey2> 2 CHECKMULTISIG>
+\end{lstlisting}
+\end{emphbox}
+
+Note that \keyword{scriptSig} contains the witness script as a single element and without any extra unlocking data before it since those are in witness (check section~\ref{sec:p2sh} for how P2SH works).
+
+For validation the \keyword{scriptSig} is hashed with \keyword{HASH160} and compared to the \keyword{<20-byte-script-hash>} in \keyword{scriptPubKey}. If they are equal we can then verify the witness script as a native P2WSH.
+
+
+\subsection*{Implemented as a soft-fork}
+
+
+\subsection*{Example: spend a native segwit output type}
+
+
+\subsection*{Example: spend a nested segwit output type}
 
 
 \section{Exercises}
