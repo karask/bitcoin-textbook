@@ -398,7 +398,7 @@ if __name__ == "__main__":
 \end{lstlisting}
 \vspace{1em}
 
-This produces the serialized raw transaction in hexadecimal. We can then use \keyword{sendrawtransaction} to send this to the Bitcoin network. Notice that \keyword{bitcoin-utils} wraps the \keyword{python-bitcoinrpc} library in a proxy object so that we can send to a node directly from our python program\footnote{For an example see \url{https://github.com/karask/python-bitcoin-utils/blob/b31c82e7005e06db7f780688cfcd9332d479f39d/examples/node_proxy.py}}.
+This produces the serialized raw transaction in hexadecimal. We can then use \keyword{sendrawtransaction} to send this to the Bitcoin network. Notice that \keyword{bitcoin-utils} wraps the \keyword{python-bitcoinrpc} library in a proxy object so that we can send commands to a node directly from our Python program\footnote{For an example see \url{https://github.com/karask/python-bitcoin-utils/blob/b31c82e7005e06db7f780688cfcd9332d479f39d/examples/node_proxy.py}}.
 
 
 
@@ -525,8 +525,9 @@ If the hashed redeem script is equal to the 20-byte hash value the above script 
 
 \begin{emphbox}
 \begin{lstlisting}[style=Pseudomath]
-<Director's signature> <CFO's signature> 2 <Director's Public Key>
-<CFO's Public Key> <COO's Public Key> 3 CHECKMULTISIG
+<Director's signature> <CFO's signature> 2
+<Director's Public Key> <CFO's Public Key> <COO's Public Key>
+3 CHECKMULTISIG
 \end{lstlisting}
 \end{emphbox}
 
@@ -648,6 +649,7 @@ As already mentioned, the first time we spend from the address, i.e. broadcastin
 
 
 \section{Segregated Witness (SegWit)}
+\label{sec:segwit}
 
 In this section we will briefly explain what Segregated Witness is, what it changes and how scripts can be created programmatically. 
 
@@ -788,15 +790,154 @@ For validation the \keyword{scriptSig} is hashed with \keyword{HASH160} and comp
 
 
 \subsection*{Implemented as a soft-fork}
+TODO
 
 
 \subsection*{Example: spend a native segwit output type}
+Assuming that a P2WPKH address have some funds (UTXOs) we can use the following code to send some funds to a legacy address. As usual, we hardcode the UTXOs for simplicity.
+
+\vspace{1em}
+\begin{lstlisting}[style=Python]
+from bitcoinutils.setup import setup
+from bitcoinutils.utils import to_satoshis
+from bitcoinutils.transactions import Transaction, TxInput, TxOutput
+from bitcoinutils.keys import P2pkhAddress, PrivateKey
+from bitcoinutils.script import Script
+
+def main():
+    # always remember to setup the network
+    setup('testnet')
+
+    # the key that corresponds to the P2WPKH address
+    priv = PrivateKey("cVdte9ei2xsVjmZSPtyucG43YZgNkmKTqhwiUA8M4Fc3LdPJxPmZ")
+
+    pub = priv.get_public_key()
+
+    fromAddress = pub.get_segwit_address()
+    print(fromAddress.to_string())
+
+    # amount is needed to sign the segwit input
+    fromAddressAmount = to_satoshis(0.01)
+
+    # UTXO of fromAddress
+    txid = '13d2d30eca974e8fa5da11b9608fa36905a22215e8df895e767fc903889367ff'
+    vout = 0
+
+    toAddress = P2pkhAddress('mrrKUpJnAjvQntPgz2Z4kkyr1gbtHmQv28')
+
+    # create transaction input from tx id of UTXO
+    txin = TxInput(txid, vout)
+
+    # the script code required for signing for p2wpkh is the same as p2pkh
+    script_code = Script(['OP_DUP', 'OP_HASH160', pub.to_hash160(),
+                           'OP_EQUALVERIFY', 'OP_CHECKSIG'])
+
+    # create transaction output
+    txOut = TxOutput(to_satoshis(0.009), toAddress.to_script_pub_key())
+
+    # create transaction without change output - if at least a single input is
+    # segwit we need to set has_segwit=True
+    tx = Transaction([txin], [txOut], has_segwit=True)
+
+    print("\nRaw transaction:\n" + tx.serialize())
+
+    sig = priv.sign_segwit_input(tx, 0, script_code, fromAddressAmount)
+    tx.witnesses.append( Script([sig, pub.to_hex()]) )
+
+    # print raw signed transaction ready to be broadcasted
+    print("\nRaw signed transaction:\n" + tx.serialize())
+    print("\nTxId:", tx.get_txid())
+
+
+if __name__ == "__main__":
+    main()
+\end{lstlisting}
+\vspace{1em}
 
 
 \subsection*{Example: spend a nested segwit output type}
+As described above we can also nest the new segwit address output types in a P2SH so that old non-segwit clients can send funds to new segwit-supporting clients. This example spends such a UTXO demonstrating a couple of additional details that need to be taken into consideration.
+
+\vspace{1em}
+\begin{lstlisting}[style=Python]
+from bitcoinutils.setup import setup
+from bitcoinutils.utils import to_satoshis
+from bitcoinutils.keys import PrivateKey, P2pkhAddress, P2shAddress
+from bitcoinutils.transactions import Transaction, TxInput, TxOutput
+from bitcoinutils.script import Script
+
+def main():
+    # always remember to setup the network
+    setup('testnet')
+
+    # the key that corresponds to the P2WPKH address
+    priv = PrivateKey('cNho8fw3bPfLKT4jPzpANTsxTsP8aTdVBD6cXksBEXt4KhBN7uVk')
+    pub = priv.get_public_key()
+
+    # the p2sh script and the corresponding address
+    redeem_script = pub.get_segwit_address().to_script_pub_key()
+    p2sh_addr = P2shAddress.from_script(redeem_script)
+
+    # the UTXO of the P2SH-P2WPKH that we are trying to spend
+    inp = TxInput('95c5cac558a8b47436a3306ba300c8d7af4cd1d1523d35da3874153c66d99b09', 0)
+
+    # exact amount of UTXO we try to spent
+    amount = 0.0014
+
+    # the address to send funds to
+    to_addr = P2pkhAddress('mvBGdiYC8jLumpJ142ghePYuY8kecQgeqS')
+
+    # the output sending 0.001 -- 0.0004 goes to miners as fee -- no change
+    out = TxOutput(to_satoshis(0.001), to_addr.to_script_pub_key())
+
+    # create a tx with at least one segwit input
+    tx = Transaction([inp], [out], has_segwit=True)
+
+    # script code is the script that is evaluated for a witness program type; each
+    # witness program type has a specific template for the script code
+    # script code that corresponds to P2WPKH (it is the classic P2PKH)
+    script_code = pub.get_address().to_script_pub_key()
+
+    # calculate signature using the appropriate script code
+    # remember to include the original amount of the UTXO
+    sig = priv.sign_segwit_input(tx, 0, script_code, to_satoshis(amount))
+
+    # script_sig is the redeem script passed as a single element
+    inp.script_sig = Script([redeem_script.to_hex()])
+
+    # finally, the unlocking script is added as a witness
+    tx.witnesses.append(Script([sig, pub.to_hex()]))
+
+    # print raw signed transaction ready to be broadcasted
+    print("\nRaw signed transaction:\n" + tx.serialize())
+
+if __name__ == "__main__":
+    main()
+\end{lstlisting}
+\vspace{1em}
 
 
 \section{Exercises}
+
+\begin{exercise}
+Write a program that spends a UTXO. The user will provide a P2PKH address as a parameter and he will then be prompted to choose between the available UTXOs of that address.
+\end{exercise}
+
+\begin{exercise}
+In mainnet, how can we estimate what is an appropriate fee to include to a transaction?
+\end{exercise}
+
+\begin{exercise}
+Write a scriptPubKey script that requires both a key and password to unlock.
+\end{exercise}
+
+\begin{exercise}
+Create a P2SH address that corresponds to a 2-of-2 multisignature scheme. Display the address.
+\end{exercise}
+
+\begin{exercise}
+Create a script that spends funds from the P2SH address created in the previous exercise.
+\end{exercise}
 
 \begin{exercise}
 Write a Python function that goes through a serialized transaction and calculates what percentage of its size are the \keyword{scriptSig}s.
@@ -809,3 +950,23 @@ Write a script that goes through a block and prints the percentage of all the \k
 \begin{exercise}
 How can we calculate what the maximum \emph{effective} block size limit is with segwit?
 \end{exercise}
+
+\begin{exercise}
+Create a P2WSH address that contains a P2PK locking script. Then display the address.
+\end{exercise}
+
+\begin{exercise}
+Create a transaction that spends UTXOs from a P2WSH address that contains a P2PK locking script.
+\end{exercise}
+
+\begin{exercise}
+Create a P2SH(P2WSH) address that contains a P2PK locking script. Then display the address.
+\end{exercise}
+
+\begin{exercise}
+Create a transaction that spends UTXOs from a P2SH(P2WSH) address that contains a P2PK locking script.
+\end{exercise}
+
+
+
+

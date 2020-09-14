@@ -308,11 +308,28 @@ A wallet is software that allows us to manage the private and public keys as wel
 Nowadays, most wallets are \emph{Hierarchical Deterministic (HD)} since they offer more flexibility, easier backups and enchanced security in certain use cases. HD wallets are described in detail in \emph{Bitcoin Improvement Proposals (BIPs)} 32\footnote{https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki}, 43\footnote{https://github.com/bitcoin/bips/blob/master/bip-0043.mediawiki} and 44\footnote{https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki}. 
 
 
-\section{More examples using the \keyword{bitcoin-utils} library}
-This section will provide multitude of examples of how to create and use keys and addresses using the \keyword{bitcoin-utils} Python library.
+\section{More examples}
+This section will provide more examples of how to create and use keys and addresses using the \keyword{bitcoin-utils} Python library.
 
 \subsection*{Create a P2SH-P2WPKH address}
-\keyword{TODO}
+In this example we will create and display a P2SH address that wraps a P2WPKH script. For more details on what P2SH and P2WPKH are please refer to sections \ref{sec:p2sh} and \ref{sec:segwit} respectively.
+
+\vspace{1em}
+\begin{lstlisting}[style=Python]
+>>> from bitcoinutils.setup import setup
+>>> from bitcoinutils.keys import PrivateKey, P2shAddress 
+>>> setup('testnet')
+'testnet'
+>>> native_p2wpkh = PrivateKey.from_wif('cTmyBsxMQ3vyh4J3jCKYn2A'\
+...         'u7AhTKvqeYuxxkinsg6Rz3BBPrYKK').get_public_key().get_segwit_address()
+>>> print("P2WPKH:", native_p2wpkh.to_string())
+P2WPKH: tb1qsd4ax84vhem5hxgxus2u232nw9ylgftkz0szf2
+>>> nested_p2wpkh = P2shAddress.from_script(native_p2wpkh.to_script_pub_key())
+>>> print("P2SH(P2WPKH):", nested_p2wpkh.to_string())
+P2SH(P2WPKH): 2N8Z5t3GyPW1hSAEJZqQ1GUkZ9ofoGhgKPf
+\end{lstlisting}
+\vspace{1em}
+
 
 \subsection*{Sign message with private key and verify}
 We can use a private key to sign a message. In asymmetric cryptography, the recipient can then use the corresponding public key to verify that the message was not tampered with.
@@ -343,4 +360,26 @@ The signature is valid!
 We verify using the address instead of the public key. In ECDSA cryptography the public key can be reconstructed given the signature and the public key hash (or address).
 \end{note}
 
+
+\section{Exercises}
+
+\begin{exercise}
+Describe possible outcomes of mistyping a Bitcoin address when trying to send some bitcoins.
+\end{exercise}
+
+\begin{exercise}
+Use a \emph{vanity generator}, like https://github.com/samr7/vanitygen, to create some addresses.
+\end{exercise}
+
+\begin{exercise}
+Use Python and the \keyword{bitcoin-utils} library to create a simple vanity generator.
+\end{exercise}
+
+\begin{exercise}
+Write a function that creates a Bitcoin address given a public key. The only Python libraries that you are allowed to use are \keyword{hashlib} for the hashing algorithms and \keyword{binascii} to convert between hexadecimal and bytes.
+\end{exercise}
+
+\begin{exercise}
+Create and display a P2SH address than contain a P2PK script using any random private key.
+\end{exercise}
 
