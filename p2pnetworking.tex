@@ -1,0 +1,49 @@
+\chapter{P2P Networking in a nutshell}
+
+\begin{summary}
+This chapter aims to introduce the very basics of the Bitcoin Peer-to-Peer networking discussing peer (or node) discovery, blockchain synchronisation and others. 
+\end{summary}
+
+\section{Introduction}
+A Bitcoin full node serves several functions to the network.
+
+\begin{itemize}
+\item Routing Node; propagates transactions and blocks
+\item Full blockchain; also called archival node
+\item Wallet
+\item Miner
+\end{itemize}
+
+By default most nodes will have a wallet (irrespectively of its use\footnote{Wallet functionality can be disabled with \keyword{disablewallet=1} in \keyword{bitcoin.conf}}) and will be able to propagate information through the network. By default they are also archival nodes, i.e. they keep the complete list of all blocks from genesis. However, lately, some nodes opt to prune the size of the blockchain for storage purposes\footnote{This is accomplished by specifying \keyword{prone=1000} in \keyword{bitcoin.conf} to keep only the latest 1000 MiB of blocks}. Finally, only a few of those will provide mining services.
+
+In September 2020 there were around 10170 nodes in the network of which 24\% were using the Tor network\footnote{https://www.torproject.org/}. With regard to mining there were 12 known mining pools\footnote{https://www.blockchain.com/charts/pools} and more unknown ones corresponding to the mining nodes using Tor.
+
+
+\section{Peer Discovery}
+When a node is run for the first time it needs to discover other peers so that it joins the P2P network. This is accomplished with several methods:
+
+\begin{description}
+\item[DNS seeds]: A list of (hardcoded) DNS servers that return a random subset of bitcoin node addresses. It sends a \keyword{getaddr} network message to those peers to get more bitcoin addresses and so forth. The peers reply with an \keyword{addr} message that contains the addresses. The node can be configured to use a specific DNS seed overriding the defaults by using the \keyword{-dnsseed} command-line option.
+\item[Seed nodes]: A list of (hardcoded) node IP addresses from peers that are believed to be stable and trustworthy. This is a fallback to DNS seeds. A specific node can be specified by using the \keyword{-seednode} command-line option.
+\end{description}
+
+Node addresses are stored internally so the above discovery methods are only required at first run. From then on the stored addresses can be used to remain up-to-date with active nodes in the network.
+
+A list of the connected peers can be acquired with the \keyword{getpeerinfo} command and a node can connect to specific (trusted) peers with the \keyword{connect} option.
+
+
+\section{Handshaking and synchronisation}
+When a node connects to a new peer it initiates a \emph{handshake} by sending a \keyword{version} network message to establish the compatibility between peers. If the receiving peer is compatible it will send a \keyword{verack} message followed by its own \keyword{version} message.
+
+As previously discussed a \keyword{getaddr} message is send next expecting several \keyword{addr} messages in return.
+
+Initially, a node that starts for the first time only contains the genesis block and will attempt to synchronise the blockchain from its peers. This initial synchronisation is called \keyword{Initial Block Download} or \keyword{IBD}. It sends a \keyword{getblocks} message which contain its current best block as a parameter. The receiving peers reply with an \keyword{inv} (inventory) message that contains a maximum of 500 block hashes after the initiator’s best block. The initiator can then \keyword{getdata} to request the blocks themselves. The receiver will reply with several \keyword{block} messages each containing a single block.
+
+
+\section{Block Propagation and Relay Networks}
+The faster a miner receives a new block the faster they can start working on the next block. Network latency is extremely important and since the P2P network takes some time (at least for the needs of miner) there are specialized networks to help with block propagation, for example the \emph{Fast Internet Bitcoin Relay Engine (FIBRE)}\footnote{http://bitcoinfibre.org}. 
+
+FIBRE does not only help less-connected miners to compete with the bigger mining farms but more importantly reduces the chance that a solution will be propagated before another node finds a second solution, thus reducing forks and orphan/stale block rates.
+
+Note that the sole purpose of a relay network is to help propagate blocks fast between interested parties (like merchants, miners). They do not replace the P2P network rather provide additional connectivity between some nodes.
+
