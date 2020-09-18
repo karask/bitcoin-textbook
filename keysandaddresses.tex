@@ -259,10 +259,9 @@ The actual python implepmentation of converting a public key hash (the applicati
 
 \subsection*{Native Segregated Witness Addresses}
 
-Segregated Witness (segwit) is a consensus change that was activated in August 2017 and introduces an update on how transactions are constructed. It introduces two new transaction types, Pay-to-Witness-Public-Key-Hash (P2WPKH) and Pay-to-Witness-Script-Hash (P2WSH). These new transaction types are going to be explained in detail in a future chapter.
-%TODO FUTURE CHAPTER
+Segregated Witness (segwit) is a consensus change that was activated in August 2017 and introduces an update on how transactions are constructed. It introduces two new transaction types, Pay-to-Witness-Public-Key-Hash (P2WPKH) and Pay-to-Witness-Script-Hash (P2WSH). These new transaction types are going to be explained in section \ref{sec:segwit}.
 
-Native segwit addresses use a different format to display the public key hash called Bech32 encoding\footnote{https://github.com/bitcoin/bips/blob/master/bip-0173.mediawiki} (instead of Base58check). For code implementation look at the python reference implementation\footnote{https://github.com/karask/python-bitcoin-utils/blob/52b7d906f2db8ec4ed4945a04b7e4da2d1db369c/bitcoinutils/bech32.py} by Pieter Wuille.
+Native segwit addresses use a different format to display the public key hash called Bech32 encoding\footnote{https://github.com/bitcoin/bips/blob/master/bip-0173.mediawiki} (instead of Base58check). For code implementation look at the python reference implementation\footnote{\url{https://github.com/karask/python-bitcoin-utils/blob/52b7d906f2db8ec4ed4945a04b7e4da2d1db369c/bitcoinutils/bech32.py}} by Pieter Wuille.
 
 The network prefix specifies the Bitcoin network that this address would be used. Specifically, mainnet addresses start with \keyword{bc1}, testnet with \keyword{tb1} and regtest\footnote{Legacy addresses use the same prefix as testnet.} with \keyword{bcrt1}. The size of the address differentiates between public key hashes and script hashes; P2WPKH are 20 bytes long and P2WSH are 32 bytes long.
 
@@ -288,8 +287,7 @@ Let's use the bitcoin-utils library to construct a segwit address.
 
 When segwit was introduced a lot of wallets did not support the new bech32 addresses so users could not use those to send funds to segwit addresses. To remedy that, nested segwit addresses could be used.
 
-Effectively you could nest or wrap a segwit address into a P2SH address. As already mentioned P2SH addresses can be created from arbitrary scripts and thus could also include a witness script. Again, P2SH and segwit are outside our scope for now and will be explained in more detail in a later chapter.
-%TODO FUTURE CHAPTER
+Effectively you could nest or wrap a segwit address into a P2SH address. As already mentioned P2SH addresses can be created from arbitrary scripts and thus could also include a witness script. Again, P2SH and segwit are outside our scope for now and will be explained in more detail in section \ref{sec:segwit}.
 
 \begin{note}
 After the segwit upgrade one needs to choose the type of address to create (e.g. with \keyword{getnewaddress}. The supported types where \keyword{legacy}, \keyword{p2sh-segwit} and \keyword{bech32}. The default, starting from version 0.16.0, is nested addresses (\keyword{p2sh-segwit}).

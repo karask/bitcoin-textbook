@@ -55,8 +55,7 @@ To spend the funds the owner of the private key that corresponds to that address
 \end{verbatim}
 \end{emphbox}
 
-% TODO FUTURE SECTION
-Using the private key we provide an ECDSA signature of part of the transaction that we create (see future section for more details). We also provide the public key\footnote{As we have already discussed in section~\ref{sec:addresses} the public key only appears in the blockchain after we spend from an address. This is where it appears!} for additional verification.
+Using the private key we provide an ECDSA signature of part of the transaction that we create (see section~\ref{sec:signatures} for more details). We also provide the public key\footnote{As we have already discussed in section~\ref{sec:addresses} the public key only appears in the blockchain after we spend from an address. This is where it appears!} for additional verification.
 
 The validation to spend a UTXO consists of running the script of \keyword{scriptSig} plus \keyword{scriptPubKey}. Both scripts are added in the stack and executed as one script.
 
@@ -403,6 +402,7 @@ This produces the serialized raw transaction in hexadecimal. We can then use \ke
 
 
 \section{Signatures}
+\label{sec:signatures}
 
 In this section we will explain how and what needs to be signed to prove ownership of funds residing in specific addresses. 
 
@@ -790,7 +790,15 @@ For validation the \keyword{scriptSig} is hashed with \keyword{HASH160} and comp
 
 
 \subsection*{Implemented as a soft-fork}
-TODO
+Changing the transaction format is normally a hard-fork. The new transactions would not be accepted by the nodes running the old software. To go around that and implement the new functionality as a soft-fork additional effort was required. Without going into too much details:
+
+% TODO opreturn explanation in a future section
+\begin{itemize}
+\item The original transaction format was not changed. The \keyword{scriptSig} would just be empty and the \keyword{witnesses} would go in a new structure.
+\item The header \emph{should} represent the whole block and thus a witness merkle root is calculated (from all transactions' witness scripts) and included in an \keyword{OP\_RETURN} output (explained in detail in a later section) of the coinbase transaction. Being in the coinbase means that the witnesses are represented in the header via the \keyword{hashMerkleRoot} (see section~\ref{sec:mining-technical} for a reminder).
+\item Witness data are provided only when nodes ask for them and thus old nodes will get blocks without the witness data, i.e. new nodes will remove witness data before relaying the blocks to old nodes. To old nodes, segwit blocks would look like blocks that contain some non-standard transactions.
+\item Old nodes trying to spend a segwit output would violate the clean stack rule; OP\_0 <bytes in hex> will remain in the stack.
+\end{itemize}
 
 
 \subsection*{Example: spend a native segwit output type}
