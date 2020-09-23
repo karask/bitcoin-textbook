@@ -925,6 +925,22 @@ if __name__ == "__main__":
 \vspace{1em}
 
 
+\section{Pay To Multi-signature (P2MS)}
+Pay to multi-signature or \emph{Pay-to-Multisig} is a standard output type that was introduced before P2SH. Its aim was to provide a way for bitcoins to be locked by several public keys which could belong to different people. Typically, only a subset of signatures would be required. For example for a 2-of-3 multisig would require at least 2 signatures from 2 of the corresponding private keys.
+
+In section~\ref{sec:p2sh} we have seen an example of an 2-of-3 multisig wrapped in P2SH. This is the typical way to use multisig since P2SH was created because P2MS has several drawbacks:
+\begin{itemize}
+\item It is limited to 3 public keys while P2SH allows up to 15.
+\item It has no address format. To send funds to a P2MS the sender needs to know the multisig script.
+\item The public keys are visible even before an output is spent.
+\end{itemize}
+
+To construct and lock funds in a P2MS output we use the exact script that we descripted in section~\ref{sec:p2sh} and send the funds there directly.
+
+\begin{note}
+The \keyword{CHECKMULTISIG} opcode has a bug where it pops an extra element from the stack. For backword compatibility the bug cannot be fixed and thus to avoid the issue we add an additional dummy value at the beginning of the unlocking script. Typically, \keyword{OP\_0} is used as a dummy but anything is valid.
+\end{note}
+
 \section{Exercises}
 
 \begin{exercise}
@@ -974,3 +990,20 @@ Create a P2SH(P2WSH) address that contains a P2PK locking script. Then display t
 \begin{exercise}
 Create a transaction that spends UTXOs from a P2SH(P2WSH) address that contains a P2PK locking script.
 \end{exercise}
+
+\begin{exercise}
+Create a transaction that sends some bitcoins to a 2-of-2 P2MS standard output type. 
+\end{exercise}
+
+\begin{exercise}
+Create a transaction that spends some bitcoins from the 2-of-2 P2MS created above. Remember the \keyword{CHECKMULTISIG} bug.
+\end{exercise}
+
+\begin{exercise}
+Create a 2-of-3 multisig (wrapped in P2SH) and display the address.
+\end{exercise}
+
+\begin{exercise}
+Create a transaction that spends funds from the 2-of-3 multisig created above. Remember the \keyword{CHECKMULTISIG} bug.
+\end{exercise}
+
