@@ -78,6 +78,11 @@ Typically, if hashrate is obviously leaning to one side the rest of the network 
 
 Note that if the new nodes have 49\% or less they will not be able to sustain the longest chain and two incompatible chains will be created that cannot re-sync, leading to a \emph{temporary} hard-fork.
 
+\begin{note}
+Whenever a longer alternative chain appears nodes have to accept it and substitute their latest blocks up until a common parent is found with the new chain. When that happers we say that a re-organization or \emph{reorg} occured.
+\end{note}
+
+
 \section{Hard-forks}
 Blocks that would be invalid are now valid; thus new blocks created are a superset of the possible blocks that the old rule-set would allow. Neither old or new nodes will accept blocks created from the others.
 
