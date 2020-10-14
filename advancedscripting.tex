@@ -18,7 +18,7 @@ This feature was part of the initial Bitcoin implementation. Every transaction c
 \hline
 < 500 million & Specifies the earliest block height that this transactions can be added.\\
 \hline
->= 500 million & Specifies the time (Unix Epoch) after which the transaction can be added to a block.\\
+>= 500 million & Specifies the block header time (Unix Epoch) after which the transaction can be added to a block.\\
 \hline
 \end{tabular}
 \end{table}
@@ -88,7 +88,7 @@ For example, as we can see in figure~\ref{fig:script-absolute-timelock} we can c
 \subsection*{Relative at transaction input level}
 Relative timelocks where introduced in mid-2016 with BIPs 68\footnote{https://github.com/bitcoin/bips/blob/master/bip-0068.mediawiki} and 113\footnote{https://github.com/bitcoin/bips/blob/master/bip-0113.mediawiki} as a soft-fork that made use of the \keyword{nSequence} field of an input. 
 
-\keyword{nSequence} was repurposed for relative timelocks. If the most significant bit of the \keyword{nSequence} 32-bit field was \keyword{0} (i.e. \keyword{0x7FFFFFFF}) then it was interpreted as a relative timelock. Then for timelocks bit 23 would specify the type (block height or Unix Epoch) and the last 16 bits the value.
+\keyword{nSequence} was repurposed for relative timelocks. If the most significant bit of the \keyword{nSequence} 32-bit field was \keyword{0} (i.e. \keyword{0x7FFFFFFF}) then it was interpreted as a relative timelock. Then, for timelocks bit 23 would specify the type (block height or Unix Epoch time) and the last 16 bits the value.
 
 \begin{table}[h]
 \centering
@@ -274,6 +274,29 @@ if __name__ == "__main__":
     main()
 \end{lstlisting}
 \vspace{1em}
+
+
+\subsection*{Timelocks important caveat}
+\label{ssec:timelocks-important-caveat}
+Remember that \keyword{nLockTime} is set for the whole transaction and that it is either specified as a block height or as block header time (Unix Epoch). Thus, if the transaction tries to spend two inputs one with block height CLTV and the other with time CLTV it would be impossible to spend. 
+\begin{emphbox}
+\begin{lstlisting}[style=Pseudomath]
+Input 0:
+	1 OP_CLTV
+Input 1:
+	500000001 OP_CLTV
+\end{lstlisting}
+\end{emphbox}
+
+The same would apply even for a single locking script that had both types of absolute locking.
+
+\begin{emphbox}
+\begin{lstlisting}[style=Pseudomath]
+1 OP_CLTV OP_DROP 500000001 OP_CLTV
+\end{lstlisting}
+\end{emphbox}
+
+Similarly for relative timelocks that contain CSV.
 
 
 
