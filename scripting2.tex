@@ -301,7 +301,7 @@ Relative timelocks use \keyword{nSequence} which is per input and thus for CSV t
 
 
 \section{RBF \& CPFP}
-\emph{Replace-by-fee} and \emph{child-pays-for-parent} are two mechanisms that can help when transactions are stuck in the mempool due to low fees. They probably don't belong to the advanced section but RBF uses \keyword{nSequence}, the values of which, could influence timelocks. 
+\emph{Replace-by-fee} and \emph{child-pays-for-parent} are two mechanisms that can help when transactions are stuck in the mempool due to low fees. They probably don't belong to the scripting section but RBF uses \keyword{nSequence}, the values of which, could influence timelocks. 
 
 \subsection*{Replace-By-Fee}
 Replace-by-fee, specified in BIP-125\footnote{https://github.com/bitcoin/bips/blob/master/bip-0125.mediawiki} is a mechanism for replacing any transaction that is still in the mempool. It is primarily useful for re-sending a transaction of yours in case it was stuck, e.g. due to low fees. However, it may be useful for other reasons.
@@ -339,26 +339,95 @@ The \emph{sender} of some funds can use RBF to increase the fee to unstuck a tra
 \label{sec:htlc}
 
 \subsection*{Hashlocks}
+A hashlock is a type of locking script that restricts the spending of an output until a specific piece of data, e.g. a passphrase, is publicly revealed. The passphrase can be shared by any means. All hashlock outputs using the same passphrase can then be spent. Such a locking script would be:
+
+\begin{emphbox}
+\begin{lstlisting}[style=Pseudomath]
+OP_HASH256 <passphrase_hash> OP_EQUAL
+\end{lstlisting}
+\end{emphbox}
+
+This makes it possible to create multiple outputs locked with the same hashlock and when one is spent the rest will also be available for spending, since, by spending one the passphrase will be revealed). Effectively, by spending one such output you share the passphrase.
+
+Of course, since the passphrase will become public, everyone will be able to spend the rest of the outputs, which is not very useful. Thus, outputs protected by hashlocks are typically also protected by specific signatures so that only the owners of the corresponding keys could spend the remaining outputs. This is similar to what 2FA offers (something one owns and something one knows).
+
+\begin{emphbox}
+\begin{lstlisting}[style=Pseudomath]
+OP_HASH256 <passphrase_hash> OP_EQUALVERIFY 
+OP_DUP OP_HASH160 <PKHash> OP_EQUALVERIFY OP_CHECKSIG
+\end{lstlisting}
+\end{emphbox}
 
 
 \subsection*{HTLC}
+\label{ssec:htlc}
+A \emph{Hashed Time-Locked Contract} (BIP-199\footnote{https://github.com/bitcoin/bips/blob/master/bip-0199.mediawiki}) is a combination of a hashlock and a timelock that requires the receiver of a payment to either provide a passphrase or forfeit the payment allowing the sender to take the funds back. For example:
+
+\begin{emphbox}
+\begin{lstlisting}[style=Pseudomath]
+OP_IF
+    OP_SHA256 <passphrase_hash> OP_EQUALVERIFY 
+    OP_DUP OP_HASH160 <receiver PKH>
+OP_ELSE
+    100 OP_CHECKSEQUENCEVERIFY OP_DROP 
+    OP_DUP OP_HASH160 <sender PKH>
+OP_ENDIF
+OP_EQUALVERIFY
+OP_CHECKSIG
+\end{lstlisting}
+\end{emphbox}
+
+The above locking script would be created by both sender and receiver collaborating. The receiver knows the passphrase, also called \emph{pre-image}, but only shares its hash, also called \emph{digest}. The sender can then send some funds to that P2SH address. The receiver can claim the funds if he reveals (in the blockchain) the passphrase. If not, after 100 blocks pass the sender can claim the funds.
+
+Let's go through this scenario in more detail. Alice wants to learn some information, e.g. a passphrase, and is willing to pay to get it. Bob has the passphrase and is willing to \emph{sell} it\footnote{This scenario might sound very abstract but it will make more sense in the Atomic Swaps section.}. To setup an HTLC, see figure~\ref{fig:htlc} (i), the following steps are required:
+
+\begin{itemize}
+\item Alice (sender) and Bob (receiver) exchange public keys
+\item Alice and Bob agree upon a timeout threshold
+\item Bob sends the \keyword{passphrase\_hash} (digest) to Alice
+\item They can now both create the script and P2SH address
+Alice sends funds to the new P2SH address
+\end{itemize}
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.5]{images/htlc}
+\caption{HTLC setup with potential scenarios.}
+\label{fig:htlc}
+\end{center}
+\end{figure}
+
+According to the locking script there are only two possible scenarios as seen in figure~\ref{fig:htlc} (ii) and (iii) respectively.
+\begin{enumerate}[(i)]
+\setcounter{enumi}{1}
+\item Bob claims the funds and in doing so reveals the passphrase.
+\item Bob does not claim the funds until the agreed timeout. Alice can take the funds back.
+\end{enumerate}
+
+\subsection*{HTLC Applications}
+HTLC transactions are a safe and cheap method of exchanging secrets for money over the blockchain. Applications include Atomic Swaps, Lightning Network, Zero-knowledge contingent payments\footnote{https://bitcoincore.org/en/2016/02/26/zero-knowledge-contingent-payments-announcement/} and potentially several others.
+
 
 
 \section{Atomic Swaps}
 \label{sec:atomic-swaps}
+TODO
 
 
 \section{Payment Channels}
 \label{sec:payment-channels}
-
+TODO
 
 \subsection*{Spillman-style payment channels}
+TODO
 
 
 \subsection*{CLTV-style payment channels}
+TODO
 
 
 \subsection*{Poon-Dryja payment channels}
+TODO
 
 
 
@@ -373,6 +442,9 @@ In section~\ref{ssec:p2sh-csv-address-example} we created an address for a relat
 In section~\ref{ssec:p2sh-csv-spend-example} we spent from an address with a relative timelock. Now create a script that unlocks the funds from an address with an absolute timelock like the one created in the previous exercise.
 \end{exercise}
 
+\begin{exercise}
+Implement the example HTLC scenario of section~\ref{ssec:htlc}. Create the appropriate scripts for both Alice and Bob.
+\end{exercise}
 
 
 
