@@ -411,7 +411,66 @@ HTLC transactions are a safe and cheap method of exchanging secrets for money ov
 
 \section{Atomic Swaps}
 \label{sec:atomic-swaps}
-TODO
+Atomic Swaps is a way of trustlessly exchanging funds between different blockchains. You can swap funds in a predetermined exchange rate. For example Alice wants to send 1 BTC to Bob in the Bitcoin blockchain and receive 100 LTC from Bob in the Litecoin blockchain. It is important that these two transactions \emph{effectively} happen atomically, either both happen or none.
+
+To accomplish that we can use two HTLC contracts, one in each blockchain. The same passphrase should be used, thus once the funds from one of the blockchains is claimed (passphrase revealed) it can immediately be claimed in the other.
+
+Let us describe a step-by-step example demonstrating the mechanism as seen in figure~\ref{fig:atomic-swap}.
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.5]{images/atomic-swap}
+\caption{Atomic swap between Bitcoin and Litecoin blockchains.}
+\label{fig:atomic-swap}
+\end{center}
+\end{figure}
+
+\begin{enumerate}[(i)]
+\item Initial setup
+  \begin{itemize}
+  \item Alice and Bob exchange public keys on both Bitcoin and Litecoin.
+  \item Alice and Bob agree upon the timeout thresholds, say 48 and 24 hours.
+  \item Alice knows of a passphrase (pre-image) which is hashed to produce a digest; the latter is shared with Bob.
+  \end{itemize}
+
+\item Both Alice and Bob create a HTLC for the Bitcoin and Litecoin blockchain respectively. The funds can be redeemed by:
+  \begin{itemize}
+  \item the passphrase and their counterpart's signature, or
+  \item by both Alice's and Bob's signatures.
+  \item Alice sends 1 BTC to the Bitcoin's HTLC and Bob sends 100 LTC to the Litecoin's HTLC. \emph{No one} broadcasts the transaction!
+  \end{itemize}
+
+\item Both Alice and Bob create a refund transaction for the funds they have just sent
+  \begin{itemize}
+  \item Alice creates a timelocked refund transaction that would be valid after 48 hours.
+  \item Bob creates a timelocked refund transaction that would be valid after 24 hours.
+  \item Both pass the refund transaction to their counterpart for their signature (satisfying the ``both signatures'' clause of the HTLCs).
+  \item They now both have a final refund transaction that is ready to be broadcasted if something goes wrong.
+  \end{itemize}
+
+\item Alice and Bob both broadcast the funding transaction from step (ii).
+
+\item Alice unlocks the Litecoin HTLC by the ``passsphrase'' clause of the HTLC revealing the passphrase in the process.
+
+\item Bob uses the passphrase to unlock the Bitcoin HTLC as well and the atomic swap was successful.
+
+\end{enumerate}
+
+Note that the above ordering is not strict in any sense. As long as the refund transactions are both signed before the passphrase is revealed everyone is safe.
+
+If Bob does not send the LTC, Alice will be able to get her 1 BTC back after 48 hours by broadcasting her refund transaction.
+
+If Alice does not send the BTC, Bob will be able to get his 100 LTC back after 24 hours by broadcasting his refund transaction.
+
+It is important to understand that active participation is required in this exchange. For example, if Bob does not use the passphrase to claim the bitcoin in time after the passphrase is revealed, Alice can use her refund transaction and also get her bitcoin back! 
+
+\begin{note}
+Participants in an atomic swap need to inspect the blockchain for the relevant transactions!
+\end{note}
+
+Atomic swaps allow for trustless exchange between assets of different blockchains. One potential use case is trustless decentralized exchanges. 
+
+
 
 
 \section{Payment Channels}
@@ -446,6 +505,13 @@ In section~\ref{ssec:p2sh-csv-spend-example} we spent from an address with a rel
 Implement the example HTLC scenario of section~\ref{ssec:htlc}. Create the appropriate scripts for both Alice and Bob.
 \end{exercise}
 
+\begin{exercise}
+Write the HTLC locking script that Alice needs to write for the atomic swap in step (ii) as described in section~\ref{sec:atomic-swaps}. 
+\end{exercise}
+
+\begin{exercise}
+Write the unlocking script that Alice needs to use to claim the litecoin in step (v) as described in section~\ref{sec:atomic-swaps}. 
+\end{exercise}
 
 
 
