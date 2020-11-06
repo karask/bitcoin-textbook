@@ -334,9 +334,39 @@ The configuration file is bitcoin.conf and its default location depends on the o
 
 \begin{description}
 	\item[deamon=1] Runs the Bitcoin node in the background.
+	\item[server=1] Allows JSON-RPC commands but only from localhost.
 	\item[testnet=1] The Bitcoin node uses the testnet network for development (i.e. fake funds). If the option is missing or if it is `0' then mainnet (the real network) is used.
 	\item[regtest=1] This is a local test environment. The blockchain starts at height 0 (genesis block) and we can trivially mine new blocks with the \keyword{generatetoaddress} command. This allows developers to also control the block creation and get fake funds immediately. Regtest uses testnet’s network parameters (e.g. address prefixes, etc).
+	\item[addnode=12.34.56.78] Also connect to specific peer (multiple \keyword{addnode}'s can be used). If no network is specified it will only apply to mainnet.
+	\item[connect=12.34.56.78] Only connect to specific node (multiple \keyword{connect}'s can be used). If no network is specified it will only apply to mainnet.
+	\item[rpcallowip=12.34.56.78] Allows JSON-RPC connections from this IP (default is localhost).
+	\item[prune=1000] Only keep more recent blocks that fit in 1000 MiB. Pruning is not compatible with \keyword{txindex} and \keyword{rescan}. 
+	\item[mempoolsize=100] Only keep transactions that fit in 100 MiB. Transactions are ordered by fee rate and if there is not enough space the ones with the lowest fee rate are removed.
 \end{description}
+
+We can also include sections like \keyword{main}, \keyword{test} and \keyword{regtest} to provide specific options depending on the network used. Usually, when optioins are not specified under a section they apply to all sections with the exception of \keyword{addnode}, \keyword{connect}, \keyword{port}, \keyword{bind}, \keyword{rpcport}, \keyword{rpcbind} and \keyword{wallet}.
+
+A typical minimalistic config for development is:
+\begin{emphbox}
+\begin{lstlisting}[style=Bash]
+daemon=1
+testnet=1
+#regtest=1
+
+server=1
+rpcuser=kostas
+rpcpassword=toodifficulttoguess
+
+[main]
+mempoolsize=300
+
+[test]
+mempoolsize=100
+
+[regtest]
+mempoolsize=20
+\end{lstlisting}
+\end{emphbox}
 
 
 \subsection*{Examples of Calls using \keyword{bitcoin-cli}}
@@ -374,6 +404,7 @@ $ bitcoin-cli getnewaddress "" legacy
 mvBGdiYC8jLumpJ142ghePYuY8kecQgeqS
 \end{lstlisting}
 \end{emphbox}
+\noindent By default Bitcoin v0.20+ use \keyword{bech32} (or native segwit) addresses. The example above overrides the default. We will examine the different kind of Bitcoin addresses in Chapter~\ref{ch:keys-and-addresses}.
 \vspace{1em}
 
 \noindent To encrypt the wallet with a passphrase:
@@ -410,6 +441,89 @@ $ bitcoin-cli importwallet wallet.backup
 \end{lstlisting}
 \end{emphbox}
 \vspace{1em}
+
+\noindent To get the node's networking info:
+\begin{emphbox}
+\begin{lstlisting}[style=Bash]
+$ bitcoin-cli getnetworkinfo
+{
+  "version": 200000,
+  "subversion": "/Satoshi:0.20.0/",
+  "protocolversion": 70015,
+  "localservices": "0000000000000409",
+  "localservicesnames": [
+    "NETWORK",
+    "WITNESS",
+    "NETWORK_LIMITED"
+  ],
+  ... 
+}
+\end{lstlisting}
+\end{emphbox}
+\vspace{1em}
+
+\noindent To get the node's blockchain info:
+\begin{emphbox}
+\begin{lstlisting}[style=Bash]
+$ bitcoin-cli getblockchaininfo
+{
+  "chain": "test",
+  "blocks": 1887283,
+  "headers": 1887283,
+  "Bestblockhash": "0000000000074e...9d44e05b4",
+  "difficulty": 1420477.254893854,
+  "mediantime": 1604662239,
+  "verificationprogress": 0.9999999194957088,
+  "initialblockdownload": false,
+  "chainwork": "000000000000...a2762e8",
+  "size_on_disk": 28640545955,
+  "pruned": false,
+  ...
+}
+\end{lstlisting}
+\end{emphbox}
+\vspace{1em}
+
+\noindent To get the node's mining info:
+\begin{emphbox}
+\begin{lstlisting}[style=Bash]
+$ bitcoin-cli getmininginfo
+{
+  "blocks": 1887283,
+  "difficulty": 1420477.254893854,
+  "networkhashps": 131251268159888.9,
+  "pooledtx": 9,
+  "chain": "test",
+  "warnings": "Warning: unknown new rules activated (versionbit 28)"
+}
+\end{lstlisting}
+\end{emphbox}
+\vspace{1em}
+
+\noindent To get the node's wallet info:
+\begin{emphbox}
+\begin{lstlisting}[style=Bash]
+$ bitcoin-cli getwalletinfo
+{
+  "walletname": "",
+  "walletversion": 130000,
+  "balance": 3.22457944,
+  "unconfirmed_balance": 0.00000000,
+  "immature_balance": 0.00000000,
+  "txcount": 353,
+  "keypoololdest": 1597237767,
+  "keypoolsize": 999,
+  "hdseedid": "df71b88eac9079d73b3e9b3aa088952e487b9ae5",
+  "unlocked_until": 0,
+  "paytxfee": 0.00000000,
+  "private_keys_enabled": true,
+  "avoid_reuse": false,
+  "scanning": false
+}
+\end{lstlisting}
+\end{emphbox}
+\vspace{1em}
+
 
 \noindent To send 0.01 BTC to address \keyword{mvBGdiYC8jLumpJ142ghePYuY8kecQgeqS} without specifying which UTXOs to use\footnote{You can check the transaction online using a Bitcoin testnet block explorer: https://blockstream.info/testnet/tx/ff8322626c21c5bdfa1d27f75a55a1cb1d3b764bb34063f64b38f0803c370c08}:
 \begin{emphbox}

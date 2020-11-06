@@ -475,7 +475,19 @@ Atomic swaps allow for trustless exchange between assets of different blockchain
 
 \section{Payment Channels}
 \label{sec:payment-channels}
-TODO
+Payment channels is a class of techniques that allows two participants to make multiple Bitcoin transactions without committing all of those transactions to the blockchain; i.e. most of the transactions are off-chain.
+
+The Bitcoin wiki lists\footnote{https://en.bitcoin.it/wiki/Payment\_channels} several approaches to implement Payment Channels. We will only go through some of them including the one currently used in the Lightning Network.
+
+\begin{itemize}
+\item Nakamoto high-frequency transactions
+\item \textbf{Spillman-style payment channels}
+\item \textbf{CLTV-style payment channels}
+\item \textbf{Poon-Dryja payment channels}
+\item Decker-Wattenhofer duplex payment channels
+\item Decker-Russell-Osuntokun eltoo Channels (eltoo; requires SIGHASH\_INPUT)
+\end{itemize}
+
 
 \subsection*{Spillman-style payment channels}
 TODO
@@ -511,6 +523,10 @@ Write the HTLC locking script that Alice needs to write for the atomic swap in s
 
 \begin{exercise}
 Write the unlocking script that Alice needs to use to claim the litecoin in step (v) as described in section~\ref{sec:atomic-swaps}. 
+\end{exercise}
+
+\begin{exercise}
+Try to design a platform that would facilitate atomic swaps between Bitcoin and Litecoin. Think about it holistically and in practical terms; i.e. how would you design and implement such a platform. Keep a note of all the potential difficulties that might come up and try to find solutions.
 \end{exercise}
 
 
