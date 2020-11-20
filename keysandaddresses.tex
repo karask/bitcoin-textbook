@@ -295,6 +295,68 @@ After the segwit upgrade one needs to choose the type of address to create (e.g.
 \end{note}
 
 
+\subsection*{Vanity Addresses}
+These are normal addresses that contain a specific string. They are calculated randomly by creating random private keys and then check if the corresponding address starts with that string, e.g. \keyword{1KK}.
+
+\vspace{1em}
+\begin{lstlisting}[style=Python,label={lst:vanity-address-example},caption={Example of creating a vanity address using Python},captionpos=b]
+import random
+from bitcoinutils.setup import setup
+from bitcoinutils.keys import PrivateKey
+
+setup('mainnet')
+
+vanity_string = '1KK'
+found = False
+attempts = 0
+
+while(not found):
+    p = PrivateKey(secret_exponent = random.getrandbits(256))
+    a = p.get_public_key().get_address()
+    print('.', end='', flush=True)
+    attempts += 1
+    if(a.to_string().startswith(vanity_string)):
+        found = True
+
+print("\nAttempts: {}".format(attempts))
+print("Address: {}".format(a.to_string()))
+print("Secret Key: {}".format(p.to_wif()))
+\end{lstlisting}
+\vspace{1em}
+
+You will notice that it takes some time even for a short string. Legacy addresses always start with 1 so we can disregard that. Since addresses use base58 each character will take an average of $58$ attempts to be found. The next character an addition $58$ attempts (thus $58*58$). We can generalize with $58^{n}$ where $n$ is the number of characters the vanity address should start with. 
+
+There are efficient implementations for calculating vanity addresses in C, Go, Rust or other compiled system languages that will calculate much faster than our simple example above, but still to create a vanity address that starts with \keyword{1Kostas} will require 38,068,692,544 attempts ($58^{6}$). That will take considerable time regardless of the efficiency of the program or the hardware used.
+
+In practice, these large vanity addresses are created via \emph{vanity address pools}. Such pools have specialized hardware (i.e. mining hardware) that can create vanity addresses fast, albeit for a fee. However, how can they send you your private key that corresponds to the vanity address without them knowing it?
+
+\subsubsection*{Vanity Address Pools}
+Vanity address pools take advantage of an elliptic curve arithmetics property in which the public key of the sum of two public keys corresponds to the private key of the sum of the corresponding public keys. For example consider Alice having the key pair a-A and Bob the key pair b-B, then:
+
+\begin{emphbox}
+\begin{lstlisting}[style=Pseudomath]
+A+B will produce the public key of the a+b private key.
+\end{lstlisting}
+\end{emphbox}
+
+Consider that Alice wants to use a pool operated by Bob to get a vanity address. Figure~\ref{fig:vanity-address-pools} illustrates the process to securely get to the private key that corresponds to the vanity address.
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.5]{images/vanity-address-pools}
+\caption{Example of how a vanity address pool securely shares the private key to a user.}
+\label{fig:vanity-address-pools}
+\end{center}
+\end{figure}
+
+\begin{itemize}
+\item First Alice creates a key pair and sends the public key \keyword{A} to Bob.
+\item Bob creates a key pair and adds the new public key \keyword{B1} to Alice's key. Then uses the resulting public key to generate an address. If this address does not match the vanity string required by Alice, it repeats the process by creating another key pair, and so on. When a match is found the respective private key, e.g. \keyword{b9}, is send to Alice.
+\item Now Alice, and only Alice, can construct a private key that corresponds to the vanity address by adding it to her private key. 
+\end{itemize}
+
+
+
 \section{Wallets}
 
 A wallet is software that allows us to manage the private and public keys as well as our Bitcoin addresses. They usually have functionality to send bitcoins, check balances, create contact lists and other. Usually a key (i.e. address) is used only once. Depending on how the private keys are handled there are two types of wallets:
