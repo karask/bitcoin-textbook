@@ -665,14 +665,14 @@ To illustrate see figure~\ref{fig:tx-with-without-segwit} (i) for the original t
 \end{center}
 \end{figure}
 
-The segwit upgrade is described in detail in BIPs\footnote{Bitcoin Improvement Proposals} 141, 143, 144 and 145 and it provides several benefits\footnote{https://bitcoincore.org/en/2016/01/26/segwit-benefits/}. We will example two of them here: \emph{transaction malleability} and \emph{effective block size increase}.
+The segwit upgrade is described in detail in BIPs\footnote{Bitcoin Improvement Proposals} 141, 143, 144 and 145 and it provides several benefits\footnote{https://bitcoincore.org/en/2016/01/26/segwit-benefits/}. We will examine two of them here: \emph{transaction malleability} and \emph{effective block size increase}.
 
 \subsection*{Transaction malleability}
 Each transaction is uniquely identified by its \emph{transaction identifier} or \keyword{txid}. The \keyword{txid} is constructed by hashing\footnote{The SHA-256 hashing algorithm is applied twice.} the serialized transaction (the blue part of figure~\ref{fig:tx-with-without-segwit}).
 
 It is possible to slightly change the unlocking script, e.g. my a miner,  so as the resulting transaction is semantically identical to the original, thus still valid. This can be accomplished, for example, by slightly changing the encoding format of the signature.
 
-That is a problem because given how the \keyword{txid} is created even the slighest modification will change the \keyword{txid}. While the transaction is identical, i.e. funds will be moved exactly as intended, our ability to monitor this transaction is problematic given that we will be checking for confirmations in a \keyword{txid} that is not valid anymore.
+That is a problem because given how the \keyword{txid} is created even the slightest modification will change the \keyword{txid}. While the transaction is identical, i.e. funds will be moved exactly as intended, our ability to monitor this transaction is problematic given that we will be checking for confirmations in a \keyword{txid} that is not valid anymore.
 
 With segwit inputs, however, the unlocking script (the green part of figure~\ref{fig:tx-with-without-segwit} (ii) ) is not part of the \keyword{txid} construction and thus it is impossible to modify it. A non-malleable \keyword{txid} is more reliable and allows for more advanced scripts/solutions like the lightning network.
 
@@ -680,7 +680,7 @@ With segwit inputs, however, the unlocking script (the green part of figure~\ref
 \subsection*{Effective block size increase}
 The actual block size remains the same, at 1MB. However, the unlocking scripts are now not part of the block and thus more transactions can fit into the 1MB limit.
 
-Segwit introduces the concept of block \emph{weight} a new metric for the size of blocks. A block can have a maximum of weight of 4MBs. The non-witness part bytes of a transaction are now multiplied by 4 to get its weight while the witness part bytes are multiplied by 1, a discount of 75\%. This allows for an effective block size increase of 1.8x.
+Segwit introduces the concept of block \emph{weight}, a new metric for the size of blocks. A block can have a maximum weight of 4MBs. The non-witness part bytes of a transaction are now multiplied by 4 to get its weight while the witness part bytes are multiplied by 1, a discount of 75\%. This allows for an effective block size increase of 1.8x.
 
 The \emph{virtual} size, or \keyword{vsize} of a transaction is the size in bytes of a transaction including the segwit discount. For non-segwit transactions\footnote{I.e. transaction with no segwit inputs.} \keyword{size} and \keyword{vsize} are identical.
 
@@ -690,7 +690,7 @@ Segwit introduces two new transaction types, \emph{Pay-to-Witness-Public-Key-Has
 
 The locking script (\keyword{scriptPubKey}) of these new types consists of two elements, a \keyword{version byte} and the \keyword{witness program}. The version byte introduces versioning in the witness program of the script. That is another benefit of segwit, since it allows for easy updates based on a new version.
 
-Remember, that when signing to spend any output we need to provide the locking script, which is used to substitute the \keyword{scriptPubKey} before we calculate the transaction digest and sign it. For setwit transaction types each witness program corresponds to a predefined template script that is called \keyword{scriptCode}.
+Remember, that when signing to spend any output we need to provide the locking script, which is used to substitute the \keyword{scriptPubKey} before we calculate the transaction digest and sign it. For segwit transaction types each witness program corresponds to a predefined template script that is called \keyword{scriptCode}.
 
 \subsubsection*{P2WPKH}
 In segwit version 0, a P2WPKH witness program is just the 20-byte public key hash. The unlocking script (\keyword{scriptSig}) should be empty and the witness structure contains the unlocking script.
@@ -935,10 +935,10 @@ In section~\ref{sec:p2sh} we have seen an example of an 2-of-3 multisig wrapped 
 \item The public keys are visible even before an output is spent.
 \end{itemize}
 
-To construct and lock funds in a P2MS output we use the exact script that we descripted in section~\ref{sec:p2sh} and send the funds there directly.
+To construct and lock funds in a P2MS output we use the exact script that we described in section~\ref{sec:p2sh} and send the funds there directly.
 
 \begin{note}
-The \keyword{CHECKMULTISIG} opcode has a bug where it pops an extra element from the stack. For backword compatibility the bug cannot be fixed and thus to avoid the issue we add an additional dummy value at the beginning of the unlocking script. Typically, \keyword{OP\_0} is used as a dummy but anything is valid.
+The \keyword{CHECKMULTISIG} opcode has a bug where it pops an extra element from the stack. For backward compatibility the bug cannot be fixed and thus to avoid the issue we add an additional dummy value at the beginning of the unlocking script. Typically, \keyword{OP\_0} is used as a dummy but anything is valid.
 \end{note}
 
 
