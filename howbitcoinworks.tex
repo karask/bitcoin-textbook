@@ -324,9 +324,10 @@ Until now the network had been extremely resilient to any kind of attack and has
 After installing the Bitcoin software\footnote{You can find several online resources on how to install Bitcoin specifically for your operating system. Such tutorial is outside the scope of this book.} we can notice that it includes several executables, one providing the core functionality and the other for interaction and extra utility:
 \begin{description}
 	\item[bitcoind:] The daemon server that implements the Bitcoin protocol and networking functionality. It also includes a wallet. It provides a JSON-RPC API to talk to the node (ports: mainnet: 8332, testnet: 18332).
-	\item[bitcoind-cli] Provides a command-line interface to \emph{talk} to the daemon server.
-	\item[bitcoind-qt] Provides a graphical user interface to the Bitcoin peer and wallet (subset of the API as part of GUI but also provides a console for all calls).
-	\item[bitcoind-tx] Allows to create, parse or modify transactions.
+	\item[bitcoin-cli] Provides a command-line interface to \emph{talk} to the daemon server.
+	\item[bitcoin-qt] Provides a graphical user interface to the Bitcoin peer and wallet (subset of the API as part of GUI but also provides a console for all calls).
+	\item[bitcoin-tx] Allows to create, parse or modify transactions.
+	\item[bitcoin-wallet] Allows to create, parse or modify transactions.
 \end{description}
 
 \subsection*{Bitcoin software configuration and development environments}
@@ -337,6 +338,7 @@ The configuration file is bitcoin.conf and its default location depends on the o
 	\item[server=1] Allows JSON-RPC commands but only from localhost.
 	\item[testnet=1] The Bitcoin node uses the testnet network for development (i.e. fake funds). If the option is missing or if it is `0' then mainnet (the real network) is used.
 	\item[regtest=1] This is a local test environment. The blockchain starts at height 0 (genesis block) and we can trivially mine new blocks with the \keyword{generatetoaddress} command. This allows developers to also control the block creation and get fake funds immediately. Regtest uses testnet’s network parameters (e.g. address prefixes, etc).
+	\item[signet=1] New test network for development that adds an additional signature requirement for block validation. Signet is similar in nature to testnet, but more reliable and centrally controlled. Anyone can run their own unique signet for their testing purposes. Available from Bitcoin Core v0.21.0.
 	\item[addnode=12.34.56.78] Also connect to specific peer (multiple \keyword{addnode}'s can be used). If no network is specified it will only apply to mainnet.
 	\item[connect=12.34.56.78] Only connect to specific node (multiple \keyword{connect}'s can be used). If no network is specified it will only apply to mainnet.
 	\item[rpcallowip=12.34.56.78] Allows JSON-RPC connections from this IP (default is localhost).
@@ -578,6 +580,18 @@ $ bitcoin-cli getaddressesbylabel
 \end{lstlisting}
 \end{emphbox}
 \vspace{1em}
+
+% TODO test and add create wallet!!
+%\noindent To check all addresses with a particular label:
+%\begin{emphbox}
+	%\begin{lstlisting}[style=Bash]
+	%$ bitcoin-cli createwallet "testwallet"
+	%  ...
+	%\end{lstlisting}
+%\end{emphbox}
+%\vspace{1em}
+
+
 
 To get more information for the status of your node you can use commands like: \keyword{getblockchaininfo}, \keyword{getmempoolinfo}, \keyword{gettxoutsetinfo}, \keyword{getmemoryinfo}, \keyword{getrpcinfo}, \keyword{getmininginfo}, \keyword{getnetworkinfo}, \keyword{getpeerinfo}, \keyword{getdescriptorinfo}, \keyword{getaddressinfo}, \keyword{getwalletinfo}.
 
