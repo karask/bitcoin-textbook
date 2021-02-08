@@ -94,7 +94,7 @@ Let's use the bitcoin-utils library to construct the WIF and WIFC.
 >>> setup('testnet')                                   # use testnet parameters
 'testnet'
 >>> secret_exponent = 0x0dde70823a4bb0ca3bd75a2010e8d5dc091185e73d8b4257a981c695a3eba95b
->>> priv = PrivateKey(secret_exponent)
+>>> priv = PrivateKey(secret_exponent = secret_exponent)
 >>> priv.to_wif(compressed=False)
 '91h2ReUJRwJhTNd828zhc8RRVMU4krX9q3LNi4nVfiVwkMPfA9p'
 >>> priv.to_wif(compressed=True)                       # the default
