@@ -1,8 +1,13 @@
 Check TODO s in .tex files
 
-add explanation of createwallet command
+add explanation of createwallet command (for 0.21+)
 
 advanced scripting - chapter    
    hashlocks, swaps, payment channels, ...
 
+add merge mining??
+
 PSBT, statechains, MuSig, JoinMarket, PayJoin, ...
+
+ADD
+BIP-8 (34/9?)
