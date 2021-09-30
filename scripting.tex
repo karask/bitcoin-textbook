@@ -692,6 +692,16 @@ The locking script (\keyword{scriptPubKey}) of these new types consists of two e
 
 Remember, that when signing to spend any output we need to provide the locking script, which is used to substitute the \keyword{scriptPubKey} before we calculate the transaction digest and sign it. For segwit transaction types each witness program corresponds to a predefined template script that is called \keyword{scriptCode}.
 
+For example the \keyword{scriptCode} for a P2WPKH output is:
+
+\begin{emphbox}
+\begin{lstlisting}[style=Pseudomath]
+OP_DUP OP_HASH160 <pubkey-hash> OP_EQUALVERIFY OP_CHECKSIG
+\end{lstlisting}
+\end{emphbox}
+
+where the pubkey-hash is substituted with the witness program. Note that this is used from calculating the digest and not for validation (see next section).
+
 \subsubsection*{P2WPKH}
 In segwit version 0, a P2WPKH witness program is just the 20-byte public key hash. The unlocking script (\keyword{scriptSig}) should be empty and the witness structure contains the unlocking script.
 
@@ -707,7 +717,7 @@ The validation is executed as follows:
 \begin{enumerate}
 \item The `0' in scriptPubKey specifies that the following is a version 0 witness program.
 \item The length of the witness program (20-bytes) indicates that it is a P2WPKH type.
-\item The witness program must consist of exactly two items.
+\item The witness must consist of exactly two items.
 \item The \keyword{HASH160} of the <pubkey> must match the 20-bytes witness program.
 \item Finally, the signature is verified by: \keyword{<signature> <pubkey> CHECKSIG}.
 \end{enumerate}
@@ -730,7 +740,7 @@ The validation is executed as follows:
 \begin{enumerate}
 \item The `0' in scriptPubKey specifies that the following is a version 0 witness program.
 \item The length of the witness program (32-bytes) indicates that it is a P2WSH type.
-\item The witness program must consist of the unlocking script followed by the witness script) 
+\item The witness must consist of the unlocking script followed by the witness script) 
 \item The \keyword{SHA256} of the witness script must match the 32-bytes witness program
 \item Finally, the witness script is deserialized and executed after the remaining witness stack: \keyword{0 <signature1> \emph{1 <pubkey1> <pubkey2> 2 CHECKMULTISIG}}.
 \end{enumerate}

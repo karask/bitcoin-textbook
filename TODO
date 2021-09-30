@@ -1,6 +1,11 @@
 Check TODO s in .tex files
 
+add P2PK
+
+add Taproot !!!
+
 add explanation of createwallet command (for 0.21+)
+https://bitcoincore.org/en/releases/0.21.0/
 
 advanced scripting - chapter    
    hashlocks, swaps, payment channels, ...
