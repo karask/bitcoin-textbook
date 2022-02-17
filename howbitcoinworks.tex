@@ -25,7 +25,7 @@ The names 1Zed, 1Alice and 1Bob are short for the actual bitcoin addresses of Ze
 
 Alice has to prove that she is indeed the owner of the address 1Alice when she creates the $TX_y$. Bob does not need to do anything to receive the bitcoins.
 
-A transaction can consist of several \emph{inputs} (addresses to get bitcoins from\footnote{This is an oversimplification. In reality unspent outputs or UTXOs are used as inputs which are associated with an address.}) and several \emph{outputs} (addresses to send bitcoins to). When an input is used it is completely consumed; i.e. all the bitcoins that the TX contains as inputs need to be \emph{spent}.
+A transaction can consist of several \emph{inputs} (outputs of past transactions) and several \emph{outputs} (addresses to send bitcoins to). When an input is used it is completely consumed; i.e. all the bitcoins that the TX contains as inputs need to be \emph{spent}.
 
 \begin{figure}[h]
 \begin{center}
@@ -35,7 +35,7 @@ A transaction can consist of several \emph{inputs} (addresses to get bitcoins fr
 \end{center}
 \end{figure}
 
-The amount of all the inputs needs to be greater or equal to the amounts of outputs. If greater (recommended) the difference is an implied transaction fee that goes to the miners (see figure~\ref{fig:typical-transaction}). A typical transaction transfers some bitcoins to another user and returns the remaining bitcoins as change to the originating address or another address that the sender controls.
+The amount of all the inputs needs to be greater or equal to the amounts of outputs. If greater (recommended) the difference is an implied transaction fee that goes to the miners (see figure~\ref{fig:typical-transaction} where the miner receives 0.01 BTC). A typical transaction transfers some bitcoins to another user and returns the remaining bitcoins as change to the originating address or another address that the sender controls.
 
 \begin{note}
 For privacy reasons it is recommended to send the change to a different address than the originating. Most bitcoin wallets already do this behind the scenes.

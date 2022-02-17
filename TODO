@@ -4,6 +4,10 @@ add P2PK
 
 add Taproot !!!
 
+mention bech32m in taproot !!
+
+add Taproot low level code/examples !!
+
 add explanation of createwallet command (for 0.21+)
 https://bitcoincore.org/en/releases/0.21.0/
 
