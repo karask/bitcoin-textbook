@@ -186,9 +186,9 @@ When Bitcoin started it started with the highest target (\keyword{0x1d00fff}) an
 \subsection*{nonce}
 The nonce is just a number used to differentiate the hash while trying to reach the target. Given that it is only 4 bytes it can only handle ~4.2 billion combinations, while we need quintillion nowadays\footnote{As of August 2020.}.
 
-When the limit was reached miners started modifying the timestamp (e.g. -1 sec) to allow for an additional of ~4.2 billion combinations. However, there is a limit of seconds that a node can deviate from the rest of the network so that did not suffice either.
+When the limit was reached miners started modifying the timestamp (e.g. -1 sec) to allow for an additional of ~4.2 billion combinations. However, there is a limit of seconds that a node can deviate from the rest of the network so that did not suffice either\footnote{The timestamp must be higher than the median of the 11 immediate ancestors of the block and higher than the timestamp of its parent. Finally, the timestamp must be no more than 2 hours in the future.}.
 
-Finally, miners started to use the unused space of coinbase transaction inputs as an extra nonce allowing an immense amount of extra nonces to be used. and thus it had difficulty 1. Difficulty 1 requires $2^{32}$ attempts on average to find a solution. Difficulty 10 requires $2^{32} * 10$ attempts on average, etc. and thus it had difficulty 1. Difficulty 1 requires $2^{32}$ attempts on average to find a solution. Difficulty 10 requires $2^{32} * 10$ attempts on average, etc.
+Finally, miners started to use the unused space of coinbase's transaction input as an extra nonce allowing an immense amount of extra nonces to be used\footnote{The size of the coinbase input can be from 2 to 100 bytes.}. 
 
 
 \subsection*{Difficulty Adjustment}
