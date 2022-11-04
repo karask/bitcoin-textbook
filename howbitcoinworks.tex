@@ -91,7 +91,7 @@ Bitcoin mining is the process of solving the PoW puzzle and selecting the next v
 \end{center}
 \end{figure}
 
-The Proof-of-Work puzzle is to compute a cryptographic hash of the new block that we want to create which should be less than a given number. The target number that the hash needs to be less than can be deterministically calculated by all nodes and is such that it would take around 10 minutes to calculate with the current network processing power, also called hashing power. Since a hash is random it will take several attempts to find a proper hash but other nodes will verify with only one attempt.
+The Proof-of-Work puzzle is to compute a cryptographic hash (effectively a big hexadecimal number) of the new block that we want to create which should be less than a target number. The target number that the hash needs to be less than can be deterministically calculated by all nodes and is such that it would take around 10 minutes to calculate with the current network processing power, also called hashing power. Since a hash is random it will take several attempts to find a proper hash but other nodes will verify with only one attempt.
 
 \begin{note}
 A cryptographic hash function is a hash function that takes an arbitrary block of data and returns a fixed-size bit string, the cryptographic hash value, such that any (accidental or intentional) change to the data will also change the hash value significantly.
@@ -99,7 +99,7 @@ A cryptographic hash function is a hash function that takes an arbitrary block o
 
 As more miners join the blocks will be created faster so the puzzle’s difficulty automatically adjusts (increases) so that it again requires approximately 10 minutes to solve. This \emph{difficulty adjustment} is happening every 2016 blocks, which is approximately 2 weeks if each block takes 10 minutes to mine.
 
-The hash algorithm used is \keyword{SHA256} and it is applied twice to the block header. As we will see later the header uniquely represents the whole block including all the transaction and thus hashing the header is effectively the same as hashing the whole block but with the added benefit of efficiency since the header is much smaller.
+The hash algorithm used is \keyword{SHA256} and it is applied twice to the block header. As we will see later the header uniquely represents the whole block including all the transactions and thus hashing the header is effectively the same as hashing the whole block, but much more efficiently since the header is much smaller.
 
 \begin{emphbox}
 \begin{lstlisting}[style=Pseudomath]
@@ -147,7 +147,7 @@ A merkle tree\footnote{https://en.wikipedia.org/wiki/Merkle\_tree} is constructe
 \end{center}
 \end{figure}
 
-An important property of a merkle tree is that you can efficiently prove that a hash (and thus transaction) is part of the merkle root. A merkle proof consists of the hashes and their position in order to reach from a leaf TX hash to the merkle root, thus proving that that TX hash is indeed part of the merkle tree. For example to prove that \keyword{tx1} is part of the merkle root we would need to provide the hash of \keyword{cb} and its positioning (i.e. left) as well as the parent hash of \keyword{tx2} and \keyword{tx3} (\keyword{cc3f1}) and its positioning (i.e. right).
+An important property of a merkle tree is that you can efficiently prove that a hash (and thus transaction) is part of the merkle root. A merkle proof consists of the hashes required to reconstruct the merkle root from the leaf TX, thus proving that the TX hash is indeed part of the merkle tree. For example to prove that \keyword{tx1} is part of the merkle root we would need to provide the hash of \keyword{cb} and its positioning (i.e. left) as well as the parent hash of \keyword{tx2} and \keyword{tx3} (\keyword{cc3f1}) and its positioning (i.e. right).
 
 \subsection*{hashPrevBlock}
 This is the hash of the previous block in the blockchain. It designates the parent of the current block and it is effectively what chains the blocks together. For example, if someone changes a transaction in the previous block then the \keyword{hashPrevBlock} will change. This is of particular importance as we will see in more detail in section~\ref{sec:blocks-nakamote-consensus}.
@@ -157,11 +157,11 @@ Target bits or just bits is represented as an 8 hex-digit number. The first 2 di
 
 \begin{emphbox}
 \begin{lstlisting}[style=Pseudomath]
-    $target = coefficient * 2^{(8 * (exponent – 3))}$
+    $target = coefficient * 2^{(8 * (exponent - 3))}$
 \end{lstlisting}
 \end{emphbox}
 
-The highest possible target (the easiest target) is defined as \keyword{0x1d00ffff} and gives a 32-byte target of expressed as a 64 hexadecimal number) of:
+The highest possible target (the easiest target) is defined as \keyword{0x1d00ffff} and gives a 32-byte target of (expressed as a 64 hexadecimal number):
 
 \small
 \begin{emphbox}
@@ -171,7 +171,19 @@ The highest possible target (the easiest target) is defined as \keyword{0x1d00ff
 \end{emphbox}
 \normalsize
 
-If hashing the block header produces a hash that begins with 0x00000000e (or less) then we have found a solution. That would require, statistically ~$2^{32}$ (4,294,967,296) attempts on average. The smaller the target the more difficult the solution, the more attempts on average.
+In Python that would be calculated as follows:
+\vspace{1em}
+\begin{lstlisting}[style=Python,label={lst:encodings-1},caption={Python examples},captionpos=b]
+>>> 0x00ffff * 2**(8*(0x1d - 3))
+26959535291011309493156476344723991336010898738574164086137773096960
+>>> format(26959535291011309493156476344723991336010898738574164086137773096960, '064X')
+'00000000FFFF0000000000000000000000000000000000000000000000000000'
+\end{lstlisting}
+\vspace{1em}
+
+
+
+If the result of hashing the block header produces a hash that begins with 0x00000000e (or less) then we have found a solution. That would require, statistically ~$2^{32}$ (4,294,967,296) attempts on average. The smaller the target the more difficult the solution, the more attempts on average.
 
 Another representation of target, easier for humans to understand, is \emph{difficulty} which represents the ratio between the highest target and the current target:
 
@@ -192,11 +204,11 @@ Finally, miners started to use the unused space of coinbase's transaction input 
 
 
 \subsection*{Difficulty Adjustment}
-We already mentioned that we want the difficulty to find the proper hash is expected to take approximately 10 minutes. However, Bitcoin is an open system and anyone can join (or leave) the network as a miner. Thus, the network’s hashrate can increase (or decrease) with time. 
+We already mentioned that the difficulty to find the proper hash is expected to take approximately 10 minutes. However, Bitcoin is an open system and anyone can join (or leave) the network as a miner. Thus, the network’s hashrate can increase (or decrease) with time. 
 
 With more hashing power blocks will be issued faster than 10 minutes and thus the network has to adjust the difficulty of the problem accordingly.
 
-Specifically, Bitcoin nodes, check every 2016 blocks (~2 weeks) the timestamps between consecutive blocks and sums them to find out how much time $t$ it took. We want $t$ to take two weeks and thus the new difficulty will be:
+Specifically, Bitcoin nodes, check every 2016 blocks ($\sim$2 weeks) the timestamps between consecutive blocks and sums them to find out how much time $t$ it took. We want $t$ to take two weeks and thus the new difficulty will be:
 
 \begin{emphbox}
 \begin{lstlisting}[style=Pseudomath]
@@ -228,7 +240,8 @@ During the above process:
 \item If the longest chain changed we want to build on that chain from now on
   \begin{itemize}
   \item update the valid TX set
-  \item ecalculate the merkle root
+  \item update the timestamp
+  \item recalculate the merkle root
   \item use the new block as hashPrevBlock
   \end{itemize}
 \end{itemize}
