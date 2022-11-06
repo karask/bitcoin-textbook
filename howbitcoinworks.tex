@@ -206,7 +206,15 @@ Finally, miners started to use the unused space of coinbase's transaction input 
 \subsection*{Difficulty Adjustment}
 We already mentioned that the difficulty to find the proper hash is expected to take approximately 10 minutes. However, Bitcoin is an open system and anyone can join (or leave) the network as a miner. Thus, the network’s hashrate can increase (or decrease) with time. 
 
-With more hashing power blocks will be issued faster than 10 minutes and thus the network has to adjust the difficulty of the problem accordingly.
+With more hashing power blocks will be issued faster than 10 minutes and thus the network has to adjust the difficulty of the problem accordingly. This can be seen in figure~\ref{fig:hashrate-difficulty}.
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.25]{images/hashrate-difficulty}
+\caption{Hashrate and difficulty adjustment.}
+\label{fig:hashrate-difficulty}
+\end{center}
+\end{figure}
 
 Specifically, Bitcoin nodes, check every 2016 blocks ($\sim$2 weeks) the timestamps between consecutive blocks and sums them to find out how much time $t$ it took. We want $t$ to take two weeks and thus the new difficulty will be:
 
