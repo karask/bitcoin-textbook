@@ -311,7 +311,7 @@ If there are transactions in the orphaned block that are not in the orange or th
 
 Of course it would be possible that at step (v) 2 new solutions could again be found one from a node with an orange block on top and another from a green block on top. Similarly, consenus would be achieved with the following block and two blocks would be orphaned. In such a case, we would say that a 2-block \emph{reorg} occurred.
 
-Nakamoto consensus is a natural and expected reorg event that currently occurs about once per week\footnote{https://bitcoinchain.com/block\_explorer/orphaned} for 1-block reorgs. The chance of a reorg is proportional with the number of blocks and thus larger reorgs are exceedingly rare.
+Nakamoto consensus is a natural and expected reorg event that currently occurs less than once per month\footnote{https://bitcoinchain.com/block\_explorer/orphaned} even for 1-block reorgs. The chance of a reorg is proportional with the number of blocks and thus larger reorgs are exceedingly rare.
 
 \subsection*{Establishing Trust}
 As we have seen, blocks are linked together by including the hash of the previous block on the new block. For example, in figure~\ref{fig:blockchain-trust} the hash of \keyword{B1} is included in the header of \keyword{B2}.
