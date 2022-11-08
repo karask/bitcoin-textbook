@@ -344,7 +344,7 @@ Until now the network had been extremely resilient to any kind of attack and has
 \section{Basic interaction with a node}
 After installing the Bitcoin software\footnote{You can find several online resources on how to install Bitcoin specifically for your operating system. Such tutorial is outside the scope of this book.} we can notice that it includes several executables, one providing the core functionality and the other for interaction and extra utility:
 \begin{description}
-	\item[bitcoind:] The daemon server that implements the Bitcoin protocol and networking functionality. It also includes a wallet. It provides a JSON-RPC API to talk to the node (ports: mainnet: 8332, testnet: 18332).
+	\item[bitcoind:] The daemon server that implements the Bitcoin protocol and networking functionality. It also includes a wallet. It provides a JSON-RPC API to talk to the node (ports: mainnet: 8332, testnet: 18332, regtest: 18443, sigtest: 38332).
 	\item[bitcoin-cli] Provides a command-line interface to \emph{talk} to the daemon server.
 	\item[bitcoin-qt] Provides a graphical user interface to the Bitcoin peer and wallet (subset of the API as part of GUI but also provides a console for all calls).
 	\item[bitcoin-tx] Allows to create, parse or modify transactions.
