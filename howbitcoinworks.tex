@@ -403,8 +403,25 @@ $ bitcoin-cli help
 \end{emphbox}
 \vspace{1em}
 
-By default a new wallet is not created anymore. One has to be explicitly created or imported after installing the node.  
-AAAA
+After version 0.22 a bitcoin wallet is not created by default. We have to create one ourselves. We can create a default wallet with:
+
+\begin{emphbox}
+\begin{lstlisting}[style=Bash]
+$ bitcoin-cli createwallet "testwallet" load_on_startup=true
+\end{lstlisting}
+\end{emphbox}
+\vspace{1em}
+
+\noindent The default wallet is a descriptor wallet (see chapter~\ref{ch:keys-and-addresses} for more on descriptor wallets). To use commands like \keyword{importaddress} and \keyword{dumpprivkey} a non-descriptor wallet needs to be created:
+
+\begin{emphbox}
+\begin{lstlisting}[style=Bash]
+$ bitcoin-cli createwallet "testwallet-2" descriptors=false
+\end{lstlisting}
+\end{emphbox}
+\vspace{1em}
+
+
 
 \noindent To get the current block height:
 \begin{emphbox}
@@ -532,20 +549,23 @@ $ bitcoin-cli getmininginfo
 \begin{lstlisting}[style=Bash]
 $ bitcoin-cli getwalletinfo
 {
-  "walletname": "",
-  "walletversion": 130000,
-  "balance": 3.22457944,
+  "walletname": "wallet-test1",
+  "walletversion": 169900,
+  "format": "bdb",
+  "balance": 0.00065838,
   "unconfirmed_balance": 0.00000000,
   "immature_balance": 0.00000000,
-  "txcount": 353,
-  "keypoololdest": 1597237767,
-  "keypoolsize": 999,
-  "hdseedid": "df71b88eac9079d73b3e9b3aa088952e487b9ae5",
-  "unlocked_until": 0,
+  "txcount": 1,
+  "keypoololdest": 1667229693,
+  "keypoolsize": 1000,
+  "hdseedid": "c41632b90911bb4d4b172190bf9a27def9535fc4",
+  "keypoolsize_hd_internal": 1000,
   "paytxfee": 0.00000000,
   "private_keys_enabled": true,
   "avoid_reuse": false,
-  "scanning": false
+  "scanning": false,
+  "descriptors": false,
+  "external_signer": false
 }
 \end{lstlisting}
 \end{emphbox}
