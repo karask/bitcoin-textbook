@@ -23,12 +23,12 @@ Project forking is an important aspect of open source development allowing diffe
 \section{Blockchain Forks}
 A blockchain fork occurs when different peers on the network run code that implements incompatible rules. This can happen because of a software project fork when some developers take a copy of a blockchain project and develop it independently of the original but it could also happen due to a bug in a simple upgrade.
 
-If the rules implemented change to a degree that the messages are not compatible with the original rules then some peers will start rejecting some of the messages with the possibility that the peer to peer network is effectively split into two networks, depending on the kind of change that occurred; i.e. the blockchain will fork and different peers will add blocks to different blockchains.
+If the implemented rules change to a degree that the messages are not compatible with the original rules then some peers will start rejecting some of the messages with the possibility that the peer to peer network is effectively split into two networks, depending on the kind of change that occurred; i.e. the blockchain will fork and different peers will add blocks to different blockchains.
 
-Since running new code might result in a network (aka chain) fork the only way to update Bitcoin software to change protocol features is by forking.
+Since running new code might result in a network (aka chain) fork the only way to update the Bitcoin protocol\footnote{In particular the consensus rules.} is by forking.
 
 \begin{note}
-Temporary branching on the blockchain is relatively common and it is part of the Nakamoto consensus. Forking refers to compatibility breaking changes between peers.
+Temporary branching on the blockchain can sometimes occur and it is part of the Nakamoto consensus. Forking refers to compatibility breaking changes between peers.
 \end{note}
 
 Forks can occur when nodes on the network run different versions of the software. This is the case when the Bitcoin software is being upgraded, e.g. from core v0.11.2 to core v0.12.0. This is a scheduled fork and if all peers agree on the change and upgrade the software in a timely manner there will be no issues.
