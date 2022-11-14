@@ -33,14 +33,14 @@ Temporary branching on the blockchain can sometimes occur and it is part of the 
 
 Forks can occur when nodes on the network run different versions of the software. This is the case when the Bitcoin software is being upgraded, e.g. from core v0.11.2 to core v0.12.0. This is a scheduled fork and if all peers agree on the change and upgrade the software in a timely manner there will be no issues.
 
-Alternatively, competing versions might run, e.g. core v0.12.0 and classic v0.12.0. The two groups will have different roadmaps on where they wish Bitcoin to go and can compete to gain the majority of the hashing power in order for their blockchain to prevail\footnote{Prevail in terms of hashing power. Other than that both networks can co-exist.}.
+Alternatively, competing versions might run, e.g. Bitcoin Core v0.12.0 and Bitcoin Classic v0.12.0. The two groups will have different visions on how they wish Bitcoin to evolve and thus compete to gain the majority of the hashing power in order for their chain to prevail\footnote{Prevail in terms of hashing power. Other than that both networks can co-exist.}.
 
-We can have intentional forks due to software upgrades or alternative implementations and unintentional forks due to incompatibilities caused by bugs.
+We can have intentional forks due to software upgrades or alternative implementations, and unintentional forks due to incompatibilities caused by bugs.
 
 There are two different types of blockchain forking:
 \begin{description}
-\item[Soft-forks]; blocks that would be valid (to old nodes) are now invalid
-\item[Hard-forks]; blocks that would be invalid (to old nodes) are now valid
+\item[Soft-forks:] blocks that would be valid (to old nodes) are now invalid
+\item[Hard-forks:] blocks that would be invalid (to old nodes) are now valid
 \end{description}
 
 
@@ -49,8 +49,13 @@ Blocks that would be valid are now invalid; thus new blocks created are a subset
 
 In theory, even 51\% of the hashrate would be enough for the new chain since it will consistently (over a period) have the longer chain. Since the longer chain consists of new blocks which are valid by both old and new nodes, the old nodes will switch to the chain consisting new node blocks; thus the blockchain itself remains compatible between all the nodes.
 
-Soft-forks are forward compatible; valid inputs of the new version are also valid by the old version. They do not force old nodes to upgrade or else consider them out of consensus.
+Soft-forks are backward compatible; valid inputs of the new version are also valid by the old version. They do not force old nodes to upgrade or else consider them out of consensus.
 
+A easy to understand example would be a new rule that decreases the maximum block size to 300kB. From now on new nodes will accept as valid only blocks that are 300kB or less. These blocks are also valid to the old nodes so it is a soft-fork change. Since the new blocks have the majority of the hashrate the chain will eventually consist of only 300kB blocks and old nodes will slowly upgrade to the new rules\footnote{They don't have to upgrade but their larger than 300kB blocks will never be finalized in the blockchain, so they might as well upgrade.}.
+
+Another example is Segwit but that involved several changes. Several sophisticated modifications were required to implement it a soft-fork; see section~\ref{sec:segwit} for more details.
+
+To summarize, in a typical soft-fork, the new rules do not clash with the old rules.
 For a step by step example of a soft-fork and how new blocks are added on top see figure~\ref{fig:soft-fork-example}.
 
 \begin{figure}[h]
