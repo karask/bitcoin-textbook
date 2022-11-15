@@ -89,7 +89,7 @@ Whenever a longer alternative chain appears nodes have to accept it and substitu
 
 
 \section{Hard-forks}
-Blocks that would be invalid are now valid; thus new blocks created are a superset of the possible blocks that the old rule-set would allow. Neither old or new nodes will accept blocks created from the others.
+Blocks that would be invalid are now valid; thus new blocks created are a superset of the possible blocks that the old rule-set would allow. Neither old or new nodes will accept blocks created from the others\footnote{Of course this assumes that the new incompatible feature is being used in that block.}.
 
 Irrespective of the hashing rate this will result in a chain split that will not be able to be resolved unless one of the sides changes software.
 
@@ -111,13 +111,13 @@ For a step by step example of a hard-fork and how new blocks are added on top se
 \end{enumerate}
 
 
-If a hard-fork occurs the network is effectively split in two. The mining hashrate is split in two as well as the merchants and users. If one side does not change their software a hard-fork can permanently split the community in two, effectively having two separate coins from that point onwards.
+If a hard-fork occurs the network is effectively split in two. The mining hashrate is split in two as are the merchants and users. If one side does not change their software a hard-fork can permanently split the community in two, effectively having two separate coins from that point onwards.
 
-The same amount of bitcoins will exist in both chains and users will be able to access both. Miners, users and merchants have to choose which side to support and in some cases merchants/users can choose to support both; one of the coins will probably termed an altcoin and supported as such.
+The same amount of bitcoins will exist in both chains and users will be able to access both. Miners, users and merchants have to choose which side to support and in some cases merchants/users can choose to support both; one of the coins will probably be termed an altcoin and supported as such.
 
 All transactions after the split are in danger of being rolled back (e.g. allow some users to double-spend) if the fork resolves. 
 
-A chain fork also has potential replay attacks; signed transaction in one chain to be relayed on the other chain. For example, a merchant that gets some bitcoins for a product replays the transaction on the other chain to get the coins of the other chain as well.
+A chain fork also has potential replay attacks; signed transaction in one chain to be relayed on the other chain. For example, a merchant that gets some bitcoins for a product, replays the transaction on the other chain to get the coins of the other chain as well.
 
 \subsection*{Hard-fork first example}
 In June 2010 Bitcoin core v0.2.10 introduced a change to the protocol that was not forward compatible. The version messages exchanged by nodes at connection time have changed format and included checksum values.
