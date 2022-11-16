@@ -126,7 +126,16 @@ Since this would lead to a hard-fork ample time was given for all miners, users 
 
 The new feature was activated in February 2012 and it happened without any incident.
 
+
 \subsection*{Hard-fork second example}
+In August 2010 an integer overflow bug was identified\footnote{https://bitcointalk.org/index.php?topic=822.0} in Bitcoin core v0.3.9 were billions of bitcoins could be erroneously sent. The community quickly coordinated and released v0.3.10 which fixed the issue by checking more thoroughly the integer limits.
+% coordinated: https://bitcointalk.org/index.php?topic=823.40
+% fixed: https://github.com/bitcoin/bitcoin/commit/d4c6b90ca3f9b47adb1b2724a0c3514f80635c84#diff-118fcbaaba162ba17933c7893247df3aR1013
+
+The new version was soon run by the majority of nodes\footnote{Back then all nodes were mining nodes.} and thus the new chain overtook the old erroneous one removing the inflation bug.
+
+
+\subsection*{Hard-fork third example}
 In March 2013, Bitcoin core v0.8 switched its database for storing information about blocks and transactions from BerkeleyDB to LevelDB because it was more efficient. However, with the upgrade came an unexpected bug that caused incompatibility between nodes running BerkeleyDB and the new ones running LevelDB.
 
 The bug was that BerkeleyDB had a limit on effectively how many changes it can make to the database while LevelDB did not. The limit was reached and old nodes rejected the block that caused it while new nodes accepted it; blocks that would be invalid where now valid.
@@ -137,7 +146,7 @@ Major miners were easier to find however and it was quickly agreed that they swi
 
 Indeed, since it was communicated to most miners that a bug caused a split and, more importantly, since the majority of the hashrate was in the old chain the rest of the miners had strong incentive to revert to the old version as well to be part of the valid chain (and thus get rewards).
 
-There was no political, economic or other incentive to continue with the new chain and thus it died away. Some miners lost their rewards as well as a merchant via a successful double spend but other than that the incident was painless.
+There was no political, economic or other incentive to continue with the new chain and thus it died away. Some miners lost their rewards and a merchant fell victim to a successful double spend but other than that the incident was painless.
 
 \section{Upgrading Bitcoin}
 During the first years of its existence upgrading Bitcoin involved notifying node owners to upgrade via forums and mailing lists. The community was smaller and more in-line regarding the future of Bitcoin.
