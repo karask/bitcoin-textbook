@@ -153,7 +153,7 @@ During the first years of its existence upgrading Bitcoin involved notifying nod
 
 As the network grew however coordinating via forums could not scale well so new mechanisms were added to improve the process.
 
-New proposals came up on how miners can signal agreement for particular upgrades. If there was enough consensus the upgrade would be activated. Two such proposals were BIP-34\footnote{https://github.com/bitcoin/bips/blob/master/bip-0034.mediawiki} (now obsolete) and BIP-9\footnote{https://github.com/bitcoin/bips/blob/master/bip-0009.mediawiki} that is currently used.
+New proposals came up on how miners can signal agreement for particular upgrades. If there was enough consensus the upgrade would be activated. The first proposal was BIP-34\footnote{https://github.com/bitcoin/bips/blob/master/bip-0034.mediawiki} which allowed signalling for one upgrade decision at a time. It was later superseded by BIP-9\footnote{https://github.com/bitcoin/bips/blob/master/bip-0009.mediawiki} which allowed, among other benefits, more than one upgrade decision to be made. The current activation method is BIP-8\footnote{https://github.com/bitcoin/bips/blob/master/bip-0008.mediawiki} which is very similar to BIP-9 but more flexible.
 
 \subsection*{BIP-34}
 The block version was traditionally 1. The BIP suggested that when miners want to support a proposal they would increase the block version to signal that to others and specify in the coinbase input the block height when the upgrade will be activated given it has enough support. The (convention) rules were as follows:
@@ -177,7 +177,7 @@ BIP-34 allowed only one upgrade at a time and no easy way to reject a proposal t
 	\begin{itemize}
 	\item name
 	\item bit, the block version bit used to signal for this change
-	\item starttime, time (Median Time-Past, BIP-113\footnote{https://github.com/bitcoin/bips/blob/master/bip-0113.mediawiki}) when signalling can begin
+	\item starttime, time (Median Time-Past\footnote{Timestamp of the median of the past 11 blocks.}, BIP-113\footnote{https://github.com/bitcoin/bips/blob/master/bip-0113.mediawiki}) when signalling can begin
 	\item timeout, time (MTP) when change is considered rejected if not activated by then
 	\end{itemize}
 \item Threshold for activation is 95\%
@@ -192,5 +192,5 @@ The Bitcoin community opted to do only soft-fork upgrades to minimize potential 
 \end{note}
 
 The segwit upgrade was quite contentious and there was a lot of political agendas and drama involved. A good walkthrough was published in Bitcoin Magazine\footnote{https://bitcoinmagazine.com/articles/long-road-segwit-how-bitcoins-biggest-protocol-upgrade-became-reality} and several other online resources.
-
+%AAAAAAAAAAA add the blocksize wars book!
 
