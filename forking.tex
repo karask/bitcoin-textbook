@@ -193,3 +193,19 @@ The Bitcoin community opted to do only soft-fork upgrades to minimize potential 
 
 The segwit upgrade was quite contentious and there was a lot of political agendas and drama involved. A good walkthrough was published in Bitcoin Magazine\footnote{https://bitcoinmagazine.com/articles/long-road-segwit-how-bitcoins-biggest-protocol-upgrade-became-reality} and a more detailed account of what happened is described in The Blocksize War book~\cite{Bier2021-blocksize-wars}.
 
+
+\subsection*{BIP-8}
+This is the current BIP used for upgrading. It has the following differences from BIP-9:
+\begin{itemize}
+	\item Uses block height instead of timestamps for signalling; this makes it more predictable
+	\item Gives the option to reject or enforce the upgrade at the end of the timeout
+	\begin{itemize}
+		\item \keyword{lockontimeout} or LOT=False (BIP-9 equivalent bahaviour)
+		\item LOT=True (enforces lock-in)
+	\end{itemize}
+\end{itemize}
+
+BIP-8 was used for the activation of the "taproot" proposal. 
+
+
+
