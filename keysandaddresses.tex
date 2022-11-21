@@ -2,19 +2,19 @@
 \label{ch:keys-and-addresses}
 
 \begin{summary}
-In this chapter we introduce Bitcoin’s keys and addresses and describe how they are created and the rationale behind that process. We then go through different wallet types and how these keys can be used in practive.
+In this chapter we introduce Bitcoin’s keys and addresses and describe how they are created and the rationale behind that process. We then go through different wallet types and how these keys can be used in practice.
 \end{summary}
 
 \section{Private Keys}
 Bitcoin uses the Elliptic Curve Digital Signature Algorithm (ECDSA)\footnote{https://en.wikipedia.org/wiki/Elliptic\_Curve\_Digital\_Signature\_Algorithm} to create its private-public key pairs. The exact elliptic curve parameters used in Bitcoin are defined by secp256k1\footnote{https://en.bitcoin.it/wiki/Secp256k1}.
 
 \begin{note}
-n ECDSA a private key can be used to calculate the corresponding public key, and since a Bitcoin address is calculated from the public key, if you hold a private key securely you effectively have everything.
+In ECDSA a private key can be used to calculate the corresponding public key, and since a Bitcoin address is calculated from the public key, if you hold a private key securely you effectively have everything.
 \end{note}
 
 The ECDSA private key in Bitcoin is just a very large random number consisting of 256 bits or 32 bytes or 64 hexadecimal digits. Nearly all 256-bit numbers can be valid private keys as specified in secp256k1.
 
-To display a private key (the bytes) we need to format it appropriately. It could be displayed in hex but the most common format used to display a private key is Wallet Import Format (WIF) or a WIF-compressed (WIFC); both are a Base58Check\footnote{https://en.bitcoin.it/wiki/Base58Check\_encoding} encoding of the ECDSA key; Base58\footnote{https://en.wikipedia.org/wiki/Base58} with version prefix to specify the network and a 32-bit checksum.
+To display a private key (the bytes) we need to format it appropriately. It could be displayed in hex but the most common format used to display a private key is Wallet Import Format (WIF) or WIF-compressed (WIFC); both are a Base58Check\footnote{https://en.bitcoin.it/wiki/Base58Check\_encoding} encoding of the ECDSA key; Base58\footnote{https://en.wikipedia.org/wiki/Base58} with a version prefix to specify the network and a 32-bit checksum.
 
 A WIF-compressed adds an extra byte (0x01) at the end of the ECDSA key before the Base58Check encoding. It specifies whether the public key (and by extension addresses) will be compressed or not. By default most wallets use WIFC format in order to reduce the size of the blockchain\footnote{Note that the segregated witness upgrade allows only compressed public keys.}.
 
