@@ -138,7 +138,7 @@ Remember that we can represent a public key in two forms, compressed and uncompr
 
 An encoded uncompressed public key is 65 bytes long since it has the two points (32 bytes each) concatenated and a prefix of \keyword{0x04} to specify an uncompressed public key.
 
-Since the curve is mirrored in the x axis the y coordinate can only take 2 values (positive/negative) for a specific x. Thus, an encoded compressed public key is only 33 bytes long and has only the x coordinate with a prefix of \keyword{0x02} (when y is positive/even) or \keyword{0x03} (when y is negative/odd).
+Since the curve is mirrored in the x axis the y coordinate can only take 2 values for a specific x (positive/negative). Thus, an encoded compressed public key is only 33 bytes long and has only the x coordinate with a prefix of \keyword{0x02} (when y is positive/even) or \keyword{0x03} (when y is negative/odd).
 
 Let's use the bitcoin-utils library to construct a private key object from a WIF and use that to create a public key object to show its two forms.
 
