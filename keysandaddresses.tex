@@ -143,7 +143,7 @@ Since the curve is mirrored in the x axis the y coordinate can only take 2 value
 Let's use the bitcoin-utils library to construct a private key object from a WIF and use that to create a public key object to show its two forms.
 
 \vspace{1em}
-\begin{lstlisting}[style=Python,label={lst:display-public-keys},caption={Example of getting compressed and uncompressed public keys using Python},captionpos=b]
+\begin{lstlisting}[style=Python,label={lst:display-public-keys},caption={Python example to generate compressed and uncompressed public keys},captionpos=b]
 >>> from bitcoinutils.setup import setup
 >>> from bitcoinutils.keys import PrivateKey, PublicKey
 >>> setup('testnet')
@@ -182,7 +182,7 @@ Addresses can be shared to anyone who wants to sent you money. They are typicall
 
 An address typically represents the owner of a private/public pair but it can also represent a more complex script as we will see in a future chapter.
 
-Notice that we do not share the public key as one would expect in public key cryptography but rather the address, which derives from the public key. Some benefits are:
+Notice that we do not share the public key as one would expect in public key cryptography but rather the address, which is derived from the public key. Some benefits are:
 
 \begin{itemize}
 \item shorter addresses
@@ -190,7 +190,7 @@ Notice that we do not share the public key as one would expect in public key cry
 \end{itemize}
 
 \begin{note}
-Until one spends from an address the public key will never appear on the blockchain and thus to potential attackers and since the address is hashed from the public key not even quantum computers could, arguably, brute force to get the public key and then the private key. Note, however, that even if that is the case the majority of addresses would be hacked thus destroying trust in (and the value of) the network anyway!
+Until one spends from an address the public key will never appear on the blockchain and thus to potential attackers and since the address is hashed from the public key not even quantum computers could brute force to get the public key and then the private key. Note, however, that even if that is the case the majority of addresses would be hacked thus destroying trust in (and the value of) the network anyway!
 \end{note}
 
 \subsection*{Legacy Addresses}
@@ -230,12 +230,12 @@ P2SH & 5 | 0x05 & 3 & 196 | 0xc4 & 2 \\
 \label{tab:address-prefixes}
 \end{table}
 
-\keyword{P2PKH} stands for Pay to Public Key Hash and is the typical legacy address. \keyword{P2SH} stands for Pay to Script Hash and is the typical legacy script hash address.
+\keyword{P2PKH} stands for Pay to Public Key Hash and is the typical legacy address. \keyword{P2SH} stands for Pay to Script Hash and is the typical legacy script hash address; an address that is protected with an arbitrary script rather than just a private-public key pair as in the P2PKH case.
 
 Let's use the bitcoin-utils library to construct some addresses; compressed and uncompressed.
 
 \vspace{1em}
-\begin{lstlisting}[style=Python,label={lst:display-addresses},caption={Example of displaying the addresses of compressed and uncompressed public keys using Python},captionpos=b]
+\begin{lstlisting}[style=Python,label={lst:display-addresses},caption={Python example to generate compressed and uncompressed addresses},captionpos=b]
 >>> from bitcoinutils.setup import setup
 >>> from bitcoinutils.keys import PrivateKey, PublicKey, P2pkhAddress
 >>> setup('testnet')
@@ -286,12 +286,12 @@ Let's use the bitcoin-utils library to construct a segwit address.
 
 \subsection*{Nested Segregated Witness Addresses}
 
-When segwit was introduced a lot of wallets did not support the new bech32 addresses so users could not use those to send funds to segwit addresses. To remedy that, nested segwit addresses could be used.
+When segwit was introduced a lot of wallets did not support the new bech32 addresses, so users could not use them to send funds to segwit addresses. To remedy that, nested segwit addresses could be used.
 
 Effectively you could nest or wrap a segwit address into a P2SH address. As already mentioned P2SH addresses can be created from arbitrary scripts and thus could also include a witness script. Again, P2SH and segwit are outside our scope for now and will be explained in more detail in section \ref{sec:segwit}.
 
 \begin{note}
-After the segwit upgrade one needs to choose the type of address to create (e.g. with \keyword{getnewaddress}. The supported types where \keyword{legacy}, \keyword{p2sh-segwit} and \keyword{bech32}. The default, starting from version 0.16.0, is nested addresses (\keyword{p2sh-segwit}).
+	After the segwit upgrade one needs to choose the type of address to create (e.g. when using \keyword{getnewaddress}). The supported types where \keyword{legacy}, \keyword{p2sh-segwit} and \keyword{bech32}. The default, starting from version 0.16.0, was nested segwit addresses (\keyword{p2sh-segwit}) and from version 0.19 onwards the default is segwit addresses (\keyword{bech32}). The default can be changed in the configuration using \keyword{addresstype}.
 \end{note}
 
 
