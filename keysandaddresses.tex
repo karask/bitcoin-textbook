@@ -296,7 +296,7 @@ Effectively you could nest or wrap a segwit address into a P2SH address. As alre
 
 
 \subsection*{Vanity Addresses}
-These are normal addresses that contain a specific string. They are calculated randomly by creating random private keys and then check if the corresponding address starts with that string, e.g. \keyword{1KK}.
+These are normal addresses that contain a specific string. They are calculated randomly by creating random private keys and then checking if the corresponding address starts with that string, e.g. \keyword{1KK}.
 
 \vspace{1em}
 \begin{lstlisting}[style=Python,label={lst:vanity-address-example},caption={Example of creating a vanity address using Python},captionpos=b]
@@ -324,7 +324,7 @@ print("Secret Key: {}".format(p.to_wif()))
 \end{lstlisting}
 \vspace{1em}
 
-You will notice that it takes some time even for a short string. Legacy addresses always start with 1 so we can disregard that. Since addresses use base58 each character will take an average of $58$ attempts to be found. The next character an addition $58$ attempts (thus $58*58$). We can generalize with $58^{n}$ where $n$ is the number of characters the vanity address should start with. 
+You will notice that it takes some time even for a short string. Legacy addresses always start with 1 so we can disregard that. Since addresses use base58 each character will take an average of $58$ attempts to be found. The next character an additional $58$ attempts (thus $58*58$). We can generalize with $58^{n}$ where $n$ is the number of characters the vanity address should start with. 
 
 There are efficient implementations for calculating vanity addresses in C, Go, Rust or other compiled system languages that will calculate much faster than our simple example above, but still to create a vanity address that starts with \keyword{1Kostas} will require 38,068,692,544 attempts ($58^{6}$). That will take considerable time regardless of the efficiency of the program or the hardware used.
 
