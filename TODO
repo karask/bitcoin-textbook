@@ -7,6 +7,7 @@ need to update from the slides (there are several minor updates and new links/re
 (hould ead through the book again and update accordingly)
 
 add descriptors to chapter 5 (keys addresses); referenced from ch1 createwallet command
+add HD wallets to chapter 5 (if lib wraps another lib... document how to create them!)
 
 add P2PK
 
