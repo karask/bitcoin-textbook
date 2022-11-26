@@ -23,12 +23,13 @@ The standard transaction output types supported by the Bitcoin protocol are:
 
 \begin{itemize}
 \item P2PK (Pay to Public Key - not used anymore)
+\item P2MS (legacy multisignature transactions; now P2SH/P2WSH/P2TR are used instead)
 \item P2PKH (Pay to Public Key Hash)
 \item P2SH (Pay to Script Hash)
 \item P2WPKH (Pay to Witness Public Key Hash)
 \item P2WSH (Pay to Witness Script Hash)
+\item P2TR (Pay to Taproot)
 \item OP\_RETURN (allows for storing up to 80 bytes in an output)
-\item Multisignature (legacy multisignature transactions; now P2SH/P2WSH is used instead)
 \item Non-standard\footnote{Valid Non-standard transactions (containing scripts other than those defined by the standard transaction output type scripts) are rejected and not relayed by nodes. However, they can be mined if it is arranged with a miner.} (any other transaction)
 \end{itemize}
 
