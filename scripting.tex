@@ -30,7 +30,7 @@ The standard transaction output types supported by the Bitcoin protocol are:
 \item P2WSH (Pay to Witness Script Hash)
 \item P2TR (Pay to Taproot)
 \item OP\_RETURN (allows for storing up to 80 bytes in an output)
-\item Non-standard\footnote{Valid Non-standard transactions (containing scripts other than those defined by the standard transaction output type scripts) are rejected and not relayed by nodes. However, they can be mined if it is arranged with a miner.} (any other transaction)
+\item Non-standard\footnote{Valid non-standard transactions (containing scripts other than those defined by the standard transaction output type scripts) are rejected and not relayed by nodes. However, they can be mined if it is arranged with a miner.} (any other transaction)
 \end{itemize}
 
 The most common transaction output type offering a standard way of transferring bitcoins around is P2PKH (and P2WPKH), which is effectively ``pay to a Bitcoin address''. It is also possible, and used in the past, to pay directly to a public key with P2PK but that is not used anymore. Another very important transaction output type is P2SH (and P2WSH) which allows locking scripts of arbitrary complexity to be used.
@@ -62,7 +62,7 @@ Using the private key we provide an ECDSA signature of part of the transaction t
 The validation to spend a UTXO consists of running the script of \keyword{scriptSig} plus \keyword{scriptPubKey}. Both scripts are added in the stack and executed as one script.
 
 \subsection*{Validation of P2PKH Spending}
-The validation process is described in below in a step by step explanation during script execution. In each step the script element evaluated will be highlighted (left column) and the current stack (right column) will also be displayed.
+The validation process is described below in a step by step explanation during script execution. In each step, the script element evaluated will be highlighted (left column) and the current stack (right column) will also be displayed.
 
 %\begin{table}
 \begin{center}
