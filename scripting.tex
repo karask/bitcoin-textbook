@@ -321,7 +321,7 @@ All API calls can be used, including the ones to create a transaction with eithe
 
 \subsection*{Creating Transactions Programmatically}
 
-The Bitcoin node allows the creation of the basic transactions. It does not support arbitrary scripts. We can create those programmatically by explicitly specifying the locking/unlocking conditions. We will use the \keyword{python-bitcoin-utils} library that can be installed easily with \keyword{pip install bitcoin-utils} in your working python environment.
+The Bitcoin node allows the creation of basic transactions but it does not support arbitrary scripts. We can create those programmatically by explicitly specifying the locking/unlocking conditions. We will use the \keyword{python-bitcoin-utils} library that can be installed easily with \keyword{pip install bitcoin-utils} in your working python environment.
 
 There are several examples included in the library that you can consult, like the most common transaction, a P2PKH payment\footnote{\url{https://github.com/karask/python-bitcoin-utils/blob/b31c82e7005e06db7f780688cfcd9332d479f39d/examples/p2pkh_transaction.py}} with one input and two outputs (the second output being the change).
 
