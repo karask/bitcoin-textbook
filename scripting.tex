@@ -461,7 +461,7 @@ For an example of \keyword{SINGLE}, consider creating the transaction shown abov
 This section explains the rationale behind Pay to Script Hash (P2SH) type of addresses and demonstrates with code.
 
 \subsection*{Multi-signature transaction output type}
-To demonstrate the advantages of P2SH we will first go through a simple use case using first the Multisignature standard transaction output type and then implement the same script with the P2SH standard transaction output type.
+To demonstrate the advantages of P2SH we will first go through a simple use case using first P2MS, the legacy multisignature standard transaction output type, and then implement the same script with the P2SH standard transaction output type.
 
 Consider the scenario where we accept funds in an address that is not controlled by one person. For example it is typical for companies to allow spending from corporate accounts only if, say, 2 people agree. These are called multi-signature accounts. A multi-signature account requires M-of-N signatures in order to spend the funds. An address’ locking script could enforce that. For example a 2-of-3 multi-signature locking script would look like:
 
