@@ -499,9 +499,9 @@ RIPEMD-160( SHA-256( 2 <Director's Public Key> <CFO's Public Key>
 \end{lstlisting}
 \end{emphbox}
 
-Using this hash we create a Bitcoin address (same process but instead of \keyword{OP\_HASH160(pubkey)} we use \keyword{OP\_HASH160(redeem script)}) using the version prefix of \keyword{0x05} that creates addresses that start with \keyword{3}. Consult this code for the details.
+Using this hash we create a Bitcoin address (same process as described in section~\ref{ssec:legacy-addresses} but instead of \keyword{OP\_HASH160(pubkey)} we use \keyword{OP\_HASH160(redeem script)}) using the version prefix of \keyword{0x05} that creates addresses that start with \keyword{3}. 
 
-We then only need to disseminate this address to the company’s customers. The can send funds oblivious to how these funds are locked. The company knows how they are unlocked so they can prepare the appropriate unlocking script.
+We then only need to disseminate this address to the company’s customers. They can send funds oblivious to how these funds are locked. The company knows how they are unlocked so they can prepare the appropriate unlocking script.
 
 As an example, to spend the funds, the company can create the following script:
 
@@ -515,7 +515,7 @@ As an example, to spend the funds, the company can create the following script:
 
 It has two parts, the redeem script’s unlocking conditions (which in this case are two of the signatures) plus the redeem script. Notice how the redeem script is revealed only when the company spends the funds; and it only reveals the two signatures, not all three.
 
-Validation occurs in 2 steps. First we confirm that the redeem script equals the hash in the locking script. Thus we take the second part of the unlocking script and prepend it to the unlocking script as is typically done:
+Validation occurs in 2 steps. First we confirm that the redeem script equals the hash in the locking script. Thus we take the last value of the unlocking script (the redeem script) and prepend it to the unlocking script as is typically done:
 
 
 \begin{emphbox}
@@ -525,7 +525,7 @@ Validation occurs in 2 steps. First we confirm that the redeem script equals the
 \end{lstlisting}
 \end{emphbox}
 
-If the hashed redeem script is equal to the 20-byte hash value the above script will result \keyword{OP\_TRUE} and it validates that the correct redeem script was passed. We can now proceed in validating the actual redeem script using the first part of the unlocking script:
+If the hashed redeem script is equal to the 20-byte hash value the above script will result \keyword{OP\_TRUE} and it validates that the correct redeem script was passed. We can now proceed in validating the actual redeem script by first deserializing it and then prepending the rest of the unlocking script:
 
 \begin{emphbox}
 \begin{lstlisting}[style=Pseudomath]

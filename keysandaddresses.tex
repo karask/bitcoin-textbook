@@ -194,6 +194,7 @@ Until one spends from an address the public key will never appear on the blockch
 \end{note}
 
 \subsection*{Legacy Addresses}
+\label{ssec:legacy-addresses}
 
 An address is really just the hash of the public key, called public key hash (or PKH). That is how it is represented on the blockchain. The way we format addresses to display them (starting with 1, m/n, etc.) are just for our convenience. The format that we use is the Base58Check encoding of the public key hash; Base58 with version prefix to specify the network and a 32-bit checksum.
 
