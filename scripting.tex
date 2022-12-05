@@ -298,20 +298,23 @@ Thus, we can also send the commands seen before to construct transactions via JS
 
 \subsection*{Calling Node Commands Programmatically}
 
-A Python library that wraps Bitcoin’s API calls is \keyword{python-bitcoinrpc}. Install with \keyword{pip} and try it out.
+Library \keyword{python-bitcoin-utils}\footnote{The library can be installed directly with \keyword{pip install bitcoin-utils} in your working python environment} wraps a Bitcon RPC library\footnote{https://github.com/jgarzik/python-bitcoinrpc} that allows a Python program to call all the CLI commands programmatically via JSON-RPC. For example:
 
 \vspace{1em}
 \begin{lstlisting}[style=Python]
-from bitcoinrpc.authproxy import AuthServiceProxy, JSONRPCException
+from bitcoinutils.setup import setup
+from bitcoinutils.proxy import NodeProxy
 
-# user and pw are rpcuser and rpcpassword respectively
-user = "kostas"
-pw = "too_long_to_guess"     # bad practice - do not hardcode!
+# always remember to setup the network
+setup('testnet')
 
-rpc_connection = AuthServiceProxy("http://%s:%s@127.0.0.1:18332"%(user, pw))
+# get a node proxy using default host and port
+proxy = NodeProxy('rpcuser', 'rpcpw').get_proxy()
 
-block_count = rpc_connection.getblockcount()
-print(block_count)
+# call the node's getblockcount JSON-RPC method
+count = proxy.getblockcount()
+
+print(count)
 \end{lstlisting}
 \vspace{1em}
 
@@ -321,7 +324,7 @@ All API calls can be used, including the ones to create a transaction with eithe
 
 \subsection*{Creating Transactions Programmatically}
 
-The Bitcoin node allows the creation of basic transactions but it does not support arbitrary scripts. We can create those programmatically by explicitly specifying the locking/unlocking conditions. We will use the \keyword{python-bitcoin-utils} library that can be installed easily with \keyword{pip install bitcoin-utils} in your working python environment.
+The Bitcoin node allows the creation of basic transactions but it does not support arbitrary scripts. We can create those programmatically by explicitly specifying the locking/unlocking conditions. We will use the \keyword{python-bitcoin-utils} library to demonstrate.
 
 There are several examples included in the library that you can consult, like the most common transaction, a P2PKH payment\footnote{\url{https://github.com/karask/python-bitcoin-utils/blob/b31c82e7005e06db7f780688cfcd9332d479f39d/examples/p2pkh_transaction.py}} with one input and two outputs (the second output being the change).
 
@@ -399,7 +402,7 @@ if __name__ == "__main__":
 \end{lstlisting}
 \vspace{1em}
 
-This produces the serialized raw transaction in hexadecimal. We can then use \keyword{sendrawtransaction} to send this to the Bitcoin network. Notice that \keyword{bitcoin-utils} wraps the \keyword{python-bitcoinrpc} library in a proxy object so that we can send commands to a node directly from our Python program\footnote{For an example see \url{https://github.com/karask/python-bitcoin-utils/blob/b31c82e7005e06db7f780688cfcd9332d479f39d/examples/node_proxy.py}}.
+This produces the serialized raw transaction in hexadecimal. We can then use \keyword{sendrawtransaction} to broadcast this to the Bitcoin network. Notice that the transaction identifier used to create the input is hardcoded for simplicity; in an actual program we would call \keyword{listunspent} to find the available UTXOs.
 
 
 

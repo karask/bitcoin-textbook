@@ -1,7 +1,10 @@
 Re-read whole book and clean according to slide updates
 - done up to half ch1
 
-CHECK page 61... DO WE EXPLAIN hard-coded inputs?? DO WE EXPLAIN HOW TO BROADCAST THE TX CREATED ??!??!?
+CONSISTENCY
+python or Python everywhere !!!
+hardcoded or hard-coded !!!
+
 
 WHERE DO WE EXPLAIN listunspent ?!!? (to ref from page 68 when saying that we hardcode UTXOs for simplicity) ---- do we mention that for P2SH address we need to import them first !?!??  (and if import.. then rescan? then prune nodes !?!?
 
