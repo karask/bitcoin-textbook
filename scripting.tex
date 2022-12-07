@@ -1012,7 +1012,7 @@ def main():
     # create the OP_RETURN transaction output that contains "Hello!"
     txout = TxOutput(to_satoshis(0), Script(['OP_RETURN', '48656c6f21']))
 
-    # create another output to get the change - note that we have hard-coded
+    # create another output to get the change - note that we have hardcoded
     # the fee; you should not :)
     change_addr = P2pkhAddress('mmYNBho9BWQB2dSniP1NJvnPoj5EVWw89w')
     change_txout = TxOutput(to_satoshis(0.008), change_addr.to_script_pub_key())
