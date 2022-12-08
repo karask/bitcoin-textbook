@@ -297,8 +297,9 @@ Thus, we can also send the commands seen before to construct transactions via JS
 
 
 \subsection*{Calling Node Commands Programmatically}
+\label{ssec:calling-node-programmatically}
 
-Library \keyword{python-bitcoin-utils}\footnote{The library can be installed directly with \keyword{pip install bitcoin-utils} in your working Python environment} wraps a Bitcon RPC library\footnote{https://github.com/jgarzik/python-bitcoinrpc} that allows a Python program to call all the CLI commands programmatically via JSON-RPC. For example:
+Library \keyword{python-bitcoin-utils}\footnote{The library can be installed directly with \keyword{pip install bitcoin-utils} in your working Python environment} wraps a Bitcon RPC library\footnote{https://github.com/jgarzik/python-bitcoinrpc} and provides a proxy object that allows a Python program to call all the CLI commands programmatically via JSON-RPC. For example:
 
 \vspace{1em}
 \begin{lstlisting}[style=Python]
@@ -592,7 +593,7 @@ The result is address \keyword{2MvzN3FntupGqY66FuGzoK9HFXqPFyMxfVU} which can be
 
 
 \subsection*{Example: spend funds from a P2SH address}
-Assuming that someone has sent funds to the P2SH address we just created let us spend it programmatically. In this example we will hardcode UTXOs for simplicity.
+Assuming that someone has sent funds to the P2SH address we just created let us spend it programmatically. Again, we will hardcode the UTXOs for brevity but we can always use the proxy object mentioned in section~\ref{ssec:calling-node-programmatically} to get the UTXOs programmatically.
 
 \vspace{1em}
 \begin{lstlisting}[style=Python]
