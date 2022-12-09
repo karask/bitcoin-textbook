@@ -810,7 +810,7 @@ For validation the \keyword{scriptSig} is hashed with \keyword{HASH160} and comp
 \subsection*{Implemented as a soft-fork}
 Changing the transaction format is normally a hard-fork. The new transactions would not be accepted by the nodes running the old software. To go around that and implement the new functionality as a soft-fork additional effort was required. Without going into too much details:
 
-% TODO opreturn explanation in a future section
+
 \begin{itemize}
 \item The original transaction format was not changed. The \keyword{scriptSig} would just be empty and the \keyword{witnesses} would go in a new structure.
 \item The header \emph{should} represent the whole block and thus a witness merkle root is calculated (from all transactions' witness scripts) and included in an \keyword{OP\_RETURN} output (explained in detail in a later section) of the coinbase transaction. Being in the coinbase means that the witnesses are represented in the header via the \keyword{hashMerkleRoot} (see section~\ref{sec:mining-technical} for a reminder).
