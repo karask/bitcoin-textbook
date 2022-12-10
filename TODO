@@ -15,6 +15,7 @@ add relayfee in config??!?! and anything else to run the basic examples!
 
 add P2PK
 
+add RBF intricancies discussion... esp. after full-rbf is enabled?
 add Taproot !!!
 
 mention bech32m in taproot !!
