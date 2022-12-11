@@ -2,15 +2,15 @@ Re-read whole book and clean according to slide updates
 - done up to half ch6.4
 
 
-add OP_RETURN in scripting
+add OP_RETURN example in scripting
 
 need to update from the slides (there are several minor updates and new links/resource
-(hould ead through the book again and update accordingly)
+(should read through the book again and update accordingly)
 
 add descriptors to chapter 5 (keys addresses); referenced from ch1 createwallet command
 add HD wallets to chapter 5 (if lib wraps another lib... document how to create them!)
 
-add createwallet example without descriptors... (done?!)
+Test simple lab node config and make sure books mentions it (slides?)
 add relayfee in config??!?! and anything else to run the basic examples!
 
 add P2PK
