@@ -678,7 +678,7 @@ The segwit upgrade is described in detail in BIPs\footnote{Bitcoin Improvement P
 \subsection*{Transaction malleability}
 Each transaction is uniquely identified by its \emph{transaction identifier} or \keyword{txid}. The \keyword{txid} is constructed by hashing\footnote{The SHA-256 hashing algorithm is applied twice.} the serialized transaction (the blue part of figure~\ref{fig:tx-with-without-segwit}).
 
-It is possible to slightly change the unlocking script, e.g. my a miner,  so as the resulting transaction is semantically identical to the original, thus still valid. This can be accomplished, for example, by slightly changing the encoding format of the signature.
+It is possible to slightly change the unlocking script, e.g. by a miner, so as the resulting transaction is semantically identical to the original; thus still valid. This can be accomplished, for example, by slightly changing the structure of the signature\footnote{DER allows for some flexibility on how to encode the signature.}.
 
 That is a problem because given how the \keyword{txid} is created even the slightest modification will change the \keyword{txid}. While the transaction is identical, i.e. funds will be moved exactly as intended, our ability to monitor this transaction is problematic given that we will be checking for confirmations in a \keyword{txid} that is not valid anymore.
 
