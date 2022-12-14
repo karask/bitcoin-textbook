@@ -688,7 +688,7 @@ With segwit inputs, however, the unlocking script (the green part of figure~\ref
 \subsection*{Effective block size increase}
 The actual block size remains the same, at 1MB. However, the unlocking scripts are now not counted as part of the block and thus more transactions can fit into the 1MB limit.
 
-Segwit introduces the concept of block \emph{weight}, a new metric for the size of blocks. A block can have a maximum weight of 4MBs. The non-witness part bytes of a transaction are now multiplied by 4 to get its weight while the witness part bytes are multiplied by 1, a discount of 75\%. This allows for an effective block size increase of 1.8x.
+Segwit introduces the concept of block \emph{weight}, a new metric for the size of blocks. A block can have a maximum weight of 4MBs. The non-witness part bytes of a transaction are now multiplied by 4 to get its weight while the witness part bytes are multiplied by 1, a discount of 75\%. This allows for an effective block size increase of about 2.8x, if all transactions use segwit\footnote{E.g. block 748918 reached 2.77 MBs because it included a lot of P2WSH 2-of-3 multi-signature scripts.}.
 
 The \emph{virtual} size, or \keyword{vsize} of a transaction is the size in bytes of a transaction including the segwit discount. For non-segwit transactions\footnote{I.e. transaction with no segwit inputs.} \keyword{size} and \keyword{vsize} are identical.
 
