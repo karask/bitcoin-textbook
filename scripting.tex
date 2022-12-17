@@ -708,7 +708,7 @@ OP_DUP OP_HASH160 <pubkey-hash> OP_EQUALVERIFY OP_CHECKSIG
 \end{lstlisting}
 \end{emphbox}
 
-where the pubkey-hash is substituted with the witness program. Note that this is used from calculating the digest and not for validation (see next section).
+where the pubkey-hash is substituted with the witness program. Note that this is used for calculating the digest and not for validation (see next section).
 
 \subsubsection*{P2WPKH}
 In segwit version 0, a P2WPKH witness program is just the 20-byte public key hash. The unlocking script (\keyword{scriptSig}) should be empty and the witness structure contains the unlocking script.
