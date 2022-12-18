@@ -778,7 +778,7 @@ witness: <signature> <pubkey>
 \end{lstlisting}
 \end{emphbox}
 
-Note that \keyword{scriptSig} contains the redeem script as a single element and without any extra unlocking data before it since those are in witness (check section~\ref{sec:p2sh} for how P2SH works). 
+Note that for spending\footnote{From a segwit-aware wallet.} the \keyword{scriptSig} contains the redeem script as a single element and without any extra unlocking data before it since those are in witness (check section~\ref{sec:p2sh} for how P2SH works). 
 
 For validation the \keyword{scriptSig} is hashed with \keyword{HASH160} and compared to the \keyword{<20-byte-script-hash>} in \keyword{scriptPubKey}. If they are equal we can then verify the public key and signature as a native P2WPKH.
 
@@ -802,7 +802,7 @@ witness: 0 <signature1> <1 <pubkey1> <pubkey2> 2 CHECKMULTISIG>
 \end{lstlisting}
 \end{emphbox}
 
-Note that \keyword{scriptSig} contains the witness script as a single element and without any extra unlocking data before it since those are in witness (check section~\ref{sec:p2sh} for how P2SH works).
+Note that for spending the \keyword{scriptSig} contains the witness script as a single element and without any extra unlocking data before it since those are in witness (check section~\ref{sec:p2sh} for how P2SH works).
 
 For validation the \keyword{scriptSig} is hashed with \keyword{HASH160} and compared to the \keyword{<20-byte-script-hash>} in \keyword{scriptPubKey}. If they are equal we can then verify the witness script as a native P2WSH.
 
