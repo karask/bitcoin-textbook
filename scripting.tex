@@ -813,9 +813,9 @@ Changing the transaction format is normally a hard-fork. The new transactions wo
 
 \begin{itemize}
 \item The original transaction format was not changed. The \keyword{scriptSig} would just be empty and the \keyword{witnesses} would go in a new structure.
-\item The header \emph{should} represent the whole block and thus a witness merkle root is calculated (from all transactions' witness scripts) and included in an \keyword{OP\_RETURN} output (explained in detail in a later section) of the coinbase transaction. Being in the coinbase means that the witnesses are represented in the header via the \keyword{hashMerkleRoot} (see section~\ref{sec:mining-technical} for a reminder).
+\item The header \emph{should} represent the whole block and thus a witness merkle root is calculated (from all transactions' witness scripts) and included in an \keyword{OP\_RETURN} output (see section~\ref{sec:storing-data}) of the coinbase transaction. Being in the coinbase means that the witnesses are represented in the header via the \keyword{hashMerkleRoot} (see section~\ref{sec:mining-technical} for a reminder).
 \item Witness data are provided only when nodes ask for them and thus old nodes will get blocks without the witness data, i.e. new nodes will remove witness data before relaying the blocks to old nodes. To old nodes, segwit blocks would look like blocks that contain some non-standard transactions.
-\item Old nodes trying to spend a segwit output would violate the clean stack rule; OP\_0 <bytes in hex> will remain in the stack.
+\item Old nodes trying to spend a segwit output would violate the clean stack rule\footnote{If there are more than one elements after execution the stack is not \emph{clean} and is considered non standard for legacy transactions. For segwit v0 (P2WSH) and Tapscript they are considered invalid.}; OP\_0 <bytes in hex> will remain in the stack.
 \end{itemize}
 
 
@@ -854,7 +854,7 @@ def main():
     # create transaction input from tx id of UTXO
     txin = TxInput(txid, vout)
 
-    # the script code required for signing for p2wpkh is the same as p2pkh
+    # script code required for signing; for p2wpkh it is the same as p2pkh
     script_code = Script(['OP_DUP', 'OP_HASH160', pub.to_hash160(),
                            'OP_EQUALVERIFY', 'OP_CHECKSIG'])
 
@@ -920,8 +920,8 @@ def main():
     tx = Transaction([inp], [out], has_segwit=True)
 
     # script code is the script that is evaluated for a witness program type; each
-    # witness program type has a specific template for the script code
-    # script code that corresponds to P2WPKH (it is the classic P2PKH)
+    # witness program type has a specific template for the script code;
+    # the script code that corresponds to P2WPKH is the same as P2PKH
     script_code = pub.get_address().to_script_pub_key()
 
     # calculate signature using the appropriate script code
@@ -961,6 +961,7 @@ The \keyword{CHECKMULTISIG} opcode has a bug where it pops an extra element from
 
 
 \section{Storing Data (OP\_RETURN)}
+\label{sec:storing-data}
 The blockchain ensures that all existing entries are tamper-proof resistant; modifications and deletions are not allowed. This makes it quite useful for \emph{permanently} storing data that will stand the test of time, which is ideal for certain applications like notary services, certificate ownership and others.
 
 \subsection*{Indirectly}
