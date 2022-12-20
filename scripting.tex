@@ -519,17 +519,29 @@ As an example, to spend the funds, the company can create the following script:
 
 It has two parts, the redeem script’s unlocking conditions (which in this case are two of the signatures) plus the redeem script. Notice how the redeem script is revealed only when the company spends the funds; and it only reveals the two signatures, not all three.
 
-Validation occurs in 2 steps. First we confirm that the redeem script equals the hash in the locking script. Thus we take the last value of the unlocking script (the redeem script) and prepend it to the unlocking script as is typically done:
+Validation occurs in the following steps:
 
+Initially, the scriptSig part is pushed into the stack and then the stack is copied for later use. The copy would look like:
 
 \begin{emphbox}
 \begin{lstlisting}[style=Pseudomath]
+<Director's signature> <CFO's signature>
+<2 <Director's Public Key> <CFO's Public Key> <COO's Public Key>
+ 3 CHECKMULTISIG>
+\end{lstlisting}
+\end{emphbox}
+
+Then the execution continues normally:
+
+\begin{emphbox}
+\begin{lstlisting}[style=Pseudomath]
+<Director's signature> <CFO's signature>
 <2 <Director's Public Key> <CFO's Public Key> <COO's Public Key>
  3 CHECKMULTISIG>  OP_HASH160 [20-byte-hash-value] OP_EQUAL
 \end{lstlisting}
 \end{emphbox}
 
-If the hashed redeem script is equal to the 20-byte hash value the above script will result \keyword{OP\_TRUE} and it validates that the correct redeem script was passed. We can now proceed in validating the actual redeem script by first deserializing it and then prepending the rest of the unlocking script:
+If the hashed redeem script is equal to the 20-byte hash value the above script will result \keyword{OP\_TRUE} in the top of the stack, which validates that the correct redeem script was passed. We can now proceed in validating the actual redeem script. We do this by using the copy of the stack, by first deserializing the top element (redeem script) and then executing normally:
 
 \begin{emphbox}
 \begin{lstlisting}[style=Pseudomath]
