@@ -1,0 +1,6 @@
+Need to install:
+$ ...
+
+$ sudo apt-get install  texlive-bibtex-extra   biber   texlive-science
+
+$ make final
