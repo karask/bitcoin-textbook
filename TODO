@@ -25,6 +25,7 @@ add Taproot !!!
 mention bech32m in taproot !!
 
 add Taproot low level code/examples !!
+- pending taproot lib implementation
 
 add explanation of createwallet command (for 0.21+)
 https://bitcoincore.org/en/releases/0.21.0/
