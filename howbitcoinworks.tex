@@ -407,7 +407,7 @@ After version 0.22 a bitcoin wallet is not created by default. We have to create
 
 \begin{emphbox}
 \begin{lstlisting}[style=Bash]
-$ bitcoin-cli -named createwallet "testwallet" load_on_startup=true
+$ bitcoin-cli -named createwallet wallet_name="testwallet" load_on_startup=true
 \end{lstlisting}
 \end{emphbox}
 \vspace{1em}
@@ -416,7 +416,7 @@ $ bitcoin-cli -named createwallet "testwallet" load_on_startup=true
 
 \begin{emphbox}
 \begin{lstlisting}[style=Bash]
-$ bitcoin-cli -named createwallet "testwallet-2" descriptors=false
+$ bitcoin-cli -named createwallet wallet_name="testwallet-2" descriptors=false
 \end{lstlisting}
 \end{emphbox}
 \vspace{1em}
