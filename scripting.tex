@@ -746,7 +746,7 @@ The \keyword{scriptCode} for P2WPKH is identical to P2PKH.
 
 
 \subsubsection*{P2WSH}
-In segwit version 0, a P2WSH witness program is just the 32-byte script hash. The unlocking script (\keyword{scriptSig}) should be empty and the witness structure contains the unlocking script as well as the \emph{witness script}\footnote{To clarify, witness script for a P2WSH is exactly what redeem script is for a P2SH.}.
+In segwit version 0, a P2WSH witness program is just the 32-byte script hash. The unlocking script (\keyword{scriptSig}) should be empty and the witness structure\footnote{The witness structure contains all the witnesses, or \emph{script witnesses} depending on how many inputs are Segwit. Witnesses are the equivalent of the scriptSig in P2SH outputs.} contains the unlocking script as well as the \emph{witness script}\footnote{To clarify, witness script for a P2WSH is exactly what redeem script is for a P2SH.}.
 
 \begin{emphbox}
 \begin{lstlisting}[style=Pseudomath]
