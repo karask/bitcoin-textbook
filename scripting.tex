@@ -723,7 +723,7 @@ OP_DUP OP_HASH160 <pubkey-hash> OP_EQUALVERIFY OP_CHECKSIG
 where the pubkey-hash is substituted with the witness program. Note that this is used for calculating the digest and not for validation (see next section).
 
 \subsubsection*{P2WPKH}
-In segwit version 0, a P2WPKH witness program is just the 20-byte public key hash. The unlocking script (\keyword{scriptSig}) should be empty and the witness structure contains the unlocking script.
+In segwit version 0, a P2WPKH witness program is just the 20-byte public key hash. The unlocking script (\keyword{scriptSig}) should be empty and the \emph{script witness} (or just \emph{witness}\footnote{The witness structure is an array that contains one or more script witnesses that correspond to the Segwit inputs of the transaction. Each witness is effectively the \keyword{scriptSig} that unlocks that input.}) contains the unlocking script.
 
 \begin{emphbox}
 \begin{lstlisting}[style=Pseudomath]
@@ -746,7 +746,7 @@ The \keyword{scriptCode} for P2WPKH is identical to P2PKH.
 
 
 \subsubsection*{P2WSH}
-In segwit version 0, a P2WSH witness program is just the 32-byte script hash. The unlocking script (\keyword{scriptSig}) should be empty and the witness structure\footnote{The witness structure contains all the witnesses, or \emph{script witnesses} depending on how many inputs are Segwit. Witnesses are the equivalent of the scriptSig in P2SH outputs.} contains the unlocking script as well as the \emph{witness script}\footnote{To clarify, witness script for a P2WSH is exactly what redeem script is for a P2SH.}.
+In segwit version 0, a P2WSH witness program is just the 32-byte script hash. The unlocking script (\keyword{scriptSig}) should be empty and the witness contains the script that unlocks the funds as well as the \emph{witness script}\footnote{To clarify, witness script for a P2WSH is exactly what redeem script is for a P2SH and script witness or just witness is the equivalent of the scriptSig or unlocking script.}.
 
 \begin{emphbox}
 \begin{lstlisting}[style=Pseudomath]
