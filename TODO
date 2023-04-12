@@ -4,6 +4,8 @@
 Re-read whole book and clean according to slide updates
 - done up to half ch6.4
 
+Maybe re-think chapter outline? Re-visit fundamendals chapter?
+
 CHECK if Nelson Mandela's image is there and display it with a script !
 add OP_RETURN example in scripting
 - that is more work than expected..
@@ -20,7 +22,7 @@ add relayfee in config??!?! and anything else to run the basic examples!
 add P2PK
 
 add RBF intricancies discussion... esp. after full-rbf is enabled?
-add Taproot !!!
+add Taproot !!!  
 
 mention bech32m in taproot !!
 
