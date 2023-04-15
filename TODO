@@ -1,6 +1,9 @@
 
 *** ADD CONTENTS so that it is browsable from PDF VIEWERS !!
 
+- need to check maxtxfee and backup for regtest (or all networks) to ensure that the examples work as expected -- worked fine before 0.22 (?) but requires extra params in the config in newer versions
+
+
 Re-read whole book and clean according to slide updates
 - done up to half ch6.4
 
