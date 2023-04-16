@@ -30,6 +30,7 @@ add RBF intricancies discussion... esp. after full-rbf is enabled?
 add Taproot !!!  
 
 mention bech32m in taproot !!
+(add generating taproot addresses)
 
 add Taproot low level code/examples !!
 - pending taproot lib implementation
