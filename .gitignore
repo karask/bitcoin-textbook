@@ -10,3 +10,9 @@
 *.blg
 *.ilg
 *.ind
+
+# Website
+website/dist/
+website/node_modules/
+.DS_Store
+*.local

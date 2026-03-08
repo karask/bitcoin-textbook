@@ -10,6 +10,7 @@ import Scripting1 from './pages/Scripting1'
 import Scripting2 from './pages/Scripting2'
 import AdvancedTopics from './pages/AdvancedTopics'
 
+
 export default function App() {
     return (
         <Layout>

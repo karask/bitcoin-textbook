@@ -122,7 +122,7 @@ export default function StackVisualizer({ steps = P2PKH_STEPS, title = 'P2PKH Va
                 </div>
             </div>
 
-            <div className="stack-explanation">
+            <div className="stack-explanation-panel">
                 <strong>Step {step.step}:</strong> {step.explanation}
             </div>
         </div>

@@ -21,7 +21,12 @@ export default function Layout({ children }) {
 
     useEffect(() => {
         setSidebarOpen(false)
-        window.scrollTo(0, 0)
+        // Scroll to top using multiple strategies for cross-browser support
+        window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+        document.documentElement.scrollTop = 0
+        document.body.scrollTop = 0
+        const main = document.querySelector('.main-content')
+        if (main) main.scrollTop = 0
     }, [location.pathname])
 
     return (
@@ -45,10 +50,8 @@ export default function Layout({ children }) {
                 <div className="sidebar-header">
                     <NavLink to="/" className="sidebar-brand">
                         <div className="sidebar-logo">₿</div>
-                        <div>
-                            <div className="sidebar-title">Bitcoin Programming</div>
-                            <div className="sidebar-subtitle">by Konstantinos Karasavvas</div>
-                        </div>
+                        <div className="sidebar-title">Bitcoin Programming</div>
+                        <div className="sidebar-subtitle">by Konstantinos Karasavvas</div>
                     </NavLink>
                 </div>
 
@@ -69,6 +72,13 @@ export default function Layout({ children }) {
 
                 <div className="sidebar-footer">
                     <a
+                        href={`${import.meta.env.BASE_URL}downloads/bitcoin-textbook.pdf`}
+                        download
+                        className="sidebar-download"
+                    >
+                        <span className="download-icon">↓</span> Download PDF
+                    </a>
+                    <a
                         href="https://github.com/karask/bitcoin-textbook"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -76,16 +86,14 @@ export default function Layout({ children }) {
                     >
                         ⬡ View on GitHub
                     </a>
-                    <div style={{ marginTop: '8px' }}>
-                        <a
-                            href="https://github.com/karask/python-bitcoin-utils"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="sidebar-github"
-                        >
-                            📦 python-bitcoin-utils
-                        </a>
-                    </div>
+                    <a
+                        href="https://github.com/karask/python-bitcoin-utils"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="sidebar-github"
+                    >
+                        📦 python-bitcoin-utils
+                    </a>
                 </div>
             </nav>
 
