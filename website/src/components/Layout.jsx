@@ -51,7 +51,7 @@ export default function Layout({ children }) {
                     <NavLink to="/" className="sidebar-brand">
                         <div className="sidebar-logo">₿</div>
                         <div className="sidebar-title">Bitcoin Programming</div>
-                        <div className="sidebar-subtitle">by Konstantinos Karasavvas</div>
+                        <div className="sidebar-subtitle">by Konstantinos Karasavvas &copy; 2021</div>
                     </NavLink>
                 </div>
 
