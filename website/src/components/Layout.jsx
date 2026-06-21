@@ -76,7 +76,17 @@ export default function Layout({ children }) {
                         download
                         className="sidebar-download"
                     >
-                        <span className="download-icon">↓</span> Download PDF
+                        <img
+                            src={`${import.meta.env.BASE_URL}images/cover-logo-v1-preview.jpg`}
+                            alt=""
+                            className="download-cover"
+                            aria-hidden="true"
+                        />
+                        <span className="download-copy">
+                            <span className="download-title">Download PDF</span>
+                            <span className="download-meta">Bitcoin Programming</span>
+                        </span>
+                        <span className="download-icon" aria-hidden="true">↓</span>
                     </a>
                     <a
                         href="https://github.com/karask/bitcoin-textbook"
